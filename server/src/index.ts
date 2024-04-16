@@ -1,9 +1,10 @@
 import express, { Express } from "express";
 import { db } from "./config/db";
+import 'dotenv/config'
 // import cors from 'cors';
 // import router from ''
 
-const app: Express = express(); //initalize expre
+export const app: Express = express(); //initalize expre
 const PORT: number = process.env.PORT ? parseInt(process.env.PORT) : 3001; //set port number
 const env = process.env.NODE_ENV === 'production' ? 'production' : 'development' //env awareness
 
@@ -23,5 +24,5 @@ app.get('/', (req, res) => {
 })
 
   db.once('open', () => 
-    app.listen(PORT, () => console.log(`Server Running! Port: ${PORT} `))
+    app.listen(PORT, () => console.log(`Server Running! Port: ${PORT}`))
 )
