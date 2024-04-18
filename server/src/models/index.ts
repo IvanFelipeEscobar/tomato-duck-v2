@@ -17,7 +17,7 @@ interface ITask  extends Document {
 //--------------USER SCHEMA/MODEL--------------
  const userSchema: Schema = new Schema({
     email: {type: String, required: true, unique: true},
-    session: [{
+    sessions: [{
         type: Schema.Types.ObjectId, ref: 'Session', 
     }]
  })
