@@ -11,11 +11,10 @@ import {
 
 const router = express.Router();
 
-router.use("api/user/", getUser);
-
-router.route("api/user").get(getUser).post(addUser);
-router.route("api/:userId/session").put(addSession);
-router.route("api/:userId/:sessionId").delete(deleteSession).put(addTask);
-router.route("api/:sessionId/:taskId").put(toggleTaskStatus).delete(deleteTask);
+router.route("/api/user").get(getUser).post(addUser);
+router.route("/api/user/:email").post(addUser);
+router.route("/api/:userId/session").put(addSession);
+router.route("/api/:userId/:sessionId").delete(deleteSession).put(addTask);
+router.route("/api/:sessionId/:taskId").put(toggleTaskStatus).delete(deleteTask);
 
 export default router;

@@ -3,7 +3,6 @@ import { persist } from "zustand/middleware";
 
 
 export interface Session {
-  
   _id: string;
   tasks: Task[];
 }

@@ -42,8 +42,8 @@ const TaskList = ({ sess }: { sess: string }) => {
         </span>
       )}
 
-      {taskStore.tasks[sess].map((t) => (
-        <div className="flex items-center">
+      {taskStore.tasks[sess].map((t, i) => (
+        <div key={`task${i}`} className="flex items-center">
           <div>
             <button
               className="btn btn-circle bg-red-400 hover:bg-red-700 hover:skew-x-12 btn-xs"

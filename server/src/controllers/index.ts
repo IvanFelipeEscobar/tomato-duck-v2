@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
 import { User, Session, Task } from "../models";
 
-export const getUser = async ({ body }: Request, res: Response) => {
+export const getUser = async ({ params }: Request, res: Response) => {
   try {
-    const { email } = body;
-    const user = await User.findOne(email).populate({
+    const { email } = params;
+    
+    const user = await User.findOne({email}).populate({
       path: "session",
       populate: {
         path: "tasks",

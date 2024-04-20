@@ -17,10 +17,11 @@ export default function Timer() {
 
   return (
     <div className="flex flex-col justify-center items-center mx-4 mb-4">
-      <div className="flex gap-2 mb-2 ">
-        {timerTime.map((t) => (
+      <div className="flex gap-2 mb-2">
+        {timerTime.map((t, i) => (
           <button
-            className="btn btn-sm btn-info rounded-full"
+          key={`btn${i}`}
+            className="btn btn-sm btn-info rounded-full last:btn-primary"
             onClick={() => {
               const time = new Date();
               time.setSeconds(time.getSeconds() + t.add);
@@ -32,24 +33,37 @@ export default function Timer() {
           </button>
         ))}
       </div>
-      <div className="h-20 flex items-center text-info justify-center gap-1 text-5xl border-2 border-neutral m-2 rounded-lg p-2 bg-base-100">
-     {seconds !== 0 ? ( <>
-        <span>{minutes}</span>
-        <span className="mb-2">:</span>
-        <span>{seconds < 10 ? `0${seconds}` : seconds}</span>
-      </>) : (
-        <div className="text-center font-mono"><p className="text-sm italic">...time to relax</p></div>
-      )}</div>
+      <div className="h-20 flex items-center text-info justify-center gap-1 text-5xl border-2 border-error shadow-lg mt-4 rounded-lg py-2  w-40 bg-base-200">
+        {seconds !== 0 || minutes !== 0 ? (
+          <>
+            <span>{minutes}</span>
+            <span className="mb-2">:</span>
+            <span>{seconds < 10 ? `0${seconds}` : seconds}</span>
+          </>
+        ) : (
+          <div className="text-center font-mono">
+            <p className="text-sm italic">
+              {timer === 1500
+                ? "Time to rest"
+                : timer === 600
+                ? ` long break over, it's tomato time`
+                : `short break over, it's tomato time`}
+            </p>
+          </div>
+        )}
+      </div>
+
+      <span className="divider"></span>
       <div>
-      <button
-          className="btn btn-circle btn-warning"
+        <button
+          className="btn btn-circle btn-warning "
           onClick={() => {
             const time = new Date();
             time.setSeconds(time.getSeconds() + timer);
-            restart(time)
+            restart(time);
           }}
         >
-          <LuTimerReset size={24}/>
+          <LuTimerReset size={24} />
         </button>
       </div>
     </div>
