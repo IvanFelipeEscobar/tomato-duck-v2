@@ -16,12 +16,12 @@ export default function Timer() {
   ];
 
   return (
-    <div className="flex flex-col justify-center items-center mx-4 mb-4">
-      <div className="flex gap-2 mb-2">
+    <div className="flex flex-col justify-center bg-base-200 rounded-3xl p-6 mt-4 items-center mx-4 mb-4 shadow-2xl">
+      <div className="flex gap-5 mb-2">
         {timerTime.map((t, i) => (
           <button
           key={`btn${i}`}
-            className="btn btn-sm btn-info rounded-full last:btn-primary"
+            className="btn btn-sm btn-info text-base-200 tracking-wide"
             onClick={() => {
               const time = new Date();
               time.setSeconds(time.getSeconds() + t.add);
@@ -33,7 +33,7 @@ export default function Timer() {
           </button>
         ))}
       </div>
-      <div className="h-20 flex items-center text-info justify-center gap-1 text-5xl border-2 border-error shadow-lg mt-4 rounded-lg py-2  w-40 bg-base-200">
+      <div className="h-20 flex items-center font-mono text-base-100 justify-center gap-1 text-5xl shadow-xl mt-4 inset-0 py-2  w-48 bg-red-700">
         {seconds !== 0 || minutes !== 0 ? (
           <>
             <span>{minutes}</span>
@@ -41,13 +41,13 @@ export default function Timer() {
             <span>{seconds < 10 ? `0${seconds}` : seconds}</span>
           </>
         ) : (
-          <div className="text-center font-mono">
+          <div className="text-center font-serif">
             <p className="text-sm italic">
               {timer === 1500
                 ? "Time to rest"
                 : timer === 600
-                ? ` long break over, it's tomato time`
-                : `short break over, it's tomato time`}
+                ? ` Long break over, it's tomato time`
+                : `Short break over, it's tomato time`}
             </p>
           </div>
         )}
@@ -56,7 +56,7 @@ export default function Timer() {
       <span className="divider"></span>
       <div>
         <button
-          className="btn btn-circle btn-warning "
+          className="btn btn-circle btn-info"
           onClick={() => {
             const time = new Date();
             time.setSeconds(time.getSeconds() + timer);

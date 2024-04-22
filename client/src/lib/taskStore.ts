@@ -1,7 +1,10 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
-
+export interface User {
+  _id: string;
+  email: string;
+  sessions: Session[] | [];
+}
 export interface Session {
   _id: string;
   tasks: Task[];
@@ -14,32 +17,27 @@ export interface Task {
 }
 
 export interface TaskState {
-  user: string;
-  sessions: Session[];
+  user: User;
   activeSession: string | null;
-  tasks: Record<string, Task[]>;
-  isLoading: boolean;
-  error: string | null;
 }
 
 export interface TaskActions {
-  setUser: (user: string) => void;
+  setUser: (user: User) => void;
   addSession: (session: Session) => void;
   setActiveSession: (sessionId: string | null) => void;
   deleteSession: (sessionId: string) => void;
   addTask: (sessionId: string, task: Task) => void;
   delTask: (sessionId: string, taskId: string) => void;
   toggleTask: (sessionId: string, taskId: string) => void;
-  setLoading: (isLoading: boolean) => void;
-  setError: (error: string | null) => void;
 }
-const initialState: TaskState = {
-  user: 'guest',
-  sessions: [],
+
+export const initialState: TaskState = {
+  user: {
+    _id: "00001",
+    email: "guest",
+    sessions: [{ _id: "0001", tasks: [] }],
+  },
   activeSession: null,
-  tasks: {},
-  isLoading: false,
-  error: null,
 };
 
 const useTaskStore = create<TaskState & TaskActions>()(
@@ -51,64 +49,86 @@ const useTaskStore = create<TaskState & TaskActions>()(
       addSession: (session) =>
         set((state) => ({
           ...state,
-          sessions: [...state.sessions, session],
-          tasks: { ...state.tasks, [session._id]: [] },
+          user: {
+            ...state.user,
+            sessions: [...state.user.sessions, session],
+          },
           activeSession: state.activeSession || session._id,
         })),
 
-      setActiveSession: (sessionId) =>
-        set({ activeSession: sessionId }),
+      setActiveSession: (sessionId) => set({ activeSession: sessionId }),
 
       deleteSession: (sessionId: string) =>
+        set((state) => ({
+          ...state,
+          user: {
+            ...state.user,
+            sessions: state.user.sessions.filter(
+              (session) => session._id !== sessionId
+            ),
+          },
+          activeSession:
+            state.activeSession === sessionId ? null : state.activeSession,
+        })),
+
+      addTask: (sessionId, task) =>
         set((state) => {
-          const newSess = state.sessions.filter((x) => x._id !== sessionId);
-          const updatedTasks = { ...state.tasks };
-          delete newSess[parseInt(sessionId)];
-          const newActiveSess =
-            state.activeSession === sessionId
-              ? newSess.length > 0
-                ? newSess[0]._id
-                : null
-              : state.activeSession;
+          const addTaskArray = state.user.sessions.map((session) =>
+            session._id === sessionId
+              ? { ...session, tasks: [...session.tasks, task] }
+              : session
+          );
           return {
             ...state,
-            sessions: newSess,
-            tasks: updatedTasks,
-            activeSession: newActiveSess,
+            user: {
+              ...state.user,
+              sessions: addTaskArray,
+            },
           };
         }),
 
-      addTask: ( sessionId, task ) =>
-        set((state) => ({
-          tasks: {
-            ...state.tasks,
-            [sessionId]: [...state.tasks[sessionId], task],
-          },
-        })),
+      delTask: (sessionId, taskId) =>
+        set((state) => {
+          const delTaskArray = state.user.sessions.map((session) =>
+            session._id === sessionId
+              ? {
+                  ...session,
+                  tasks: session.tasks.filter((x) => x._id !== taskId),
+                }
+              : session
+          );
+          return {
+            ...state,
+            user: {
+              ...state.user,
+              sessions: delTaskArray,
+            },
+          };
+        }),
 
-      delTask: ( sessionId, taskId ) =>
-        set((state) => ({
-          tasks: {
-            ...state.tasks,
-            [sessionId]: state.tasks[sessionId].filter((x) => x._id !== taskId),
-          },
-        })),
       toggleTask: (sessionId, taskId) =>
-        set((state) => ({
-          tasks: {
-            ...state.tasks,
-            [sessionId]: state.tasks[sessionId].map((t) =>
-              t._id === taskId ? { ...t, isDone: !t.isDone } : t
-            ),
-          },
-        })),
-
-      setLoading: (isLoading: boolean) => set({ isLoading }),
-
-      setError: (error: string | null) => set({ error }),
+        set((state) => {
+          const toggleTaskArray = state.user.sessions.map((session) =>
+            session._id === sessionId
+              ? {
+                  ...session,
+                  tasks: session.tasks.map((t) =>
+                    t._id === taskId ? { ...t, isDone: !t.isDone } : t
+                  ),
+                }
+              : session
+          );
+          return {
+            ...state,
+            user: {
+              ...state.user,
+              sessions: toggleTaskArray,
+            },
+          };
+        }),
     }),
 
-    { name: "task-store"}
+    { name: "task-store" }
   )
 );
 

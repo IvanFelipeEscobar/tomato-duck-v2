@@ -3,11 +3,10 @@ import mongoose, { Schema, Document } from 'mongoose'
 //--------------INTERFACES----------------
 interface IUser extends Document {
     email: string
-    session: Array<ISession>
+    sessions: Array<ISession>
 }
 interface ISession extends Document {
     tasks: Array<ITask>
-    created: Date
 }
 interface ITask  extends Document {
     task: string;
@@ -26,10 +25,7 @@ interface ITask  extends Document {
  //--------------SESSION SCHEMA/MODEL-------------
  const sessionSchema: Schema = new Schema({
     tasks: [{type: Schema.Types.ObjectId, ref: 'Task'}],
-    created: {
-        type: Date,
-        default: Date.now
-    }
+  
  })
 
  export const Session = mongoose.model<ISession>('Session', sessionSchema)

@@ -1,18 +1,17 @@
 import { Request, Response } from "express";
 import { User, Session, Task } from "../models";
 
-export const getUser = async ({ params }: Request, res: Response) => {
+export const getUser = async ({ query }: Request, res: Response) => {
   try {
-    const { email } = params;
-    
-    const user = await User.findOne({email}).populate({
-      path: "session",
+    const { email } = query;
+    const user = await User.findOne({ email: email?.toString() }).populate({
+      path: "sessions",
       populate: {
         path: "tasks",
         select: "-__v",
       },
     });
-    if (!user) return res.status(404).json({ message: "user not found" });
+    if (!user) return res.status(404).json({ message: `user not found` });
     return res.status(200).json(user);
   } catch (error) {
     console.error(error);
@@ -23,7 +22,7 @@ export const getUser = async ({ params }: Request, res: Response) => {
 export const addUser = async ({ body }: Request, res: Response) => {
   try {
     const { email } = body;
-    const newUser = await User.create({ email, session: [] });
+    const newUser = await User.create({ email, sessions: [] });
     return res.status(201).json(newUser);
   } catch (error) {
     console.error(error);
@@ -38,7 +37,7 @@ export const addSession = async ({ params }: Request, res: Response) => {
     await User.findByIdAndUpdate(
       userId,
       {
-        $addToSet: { session: newSession._id },
+        $addToSet: { sessions: newSession._id },
       },
       {
         new: true,
@@ -55,7 +54,7 @@ export const deleteSession = async ({ params }: Request, res: Response) => {
   try {
     const { userId, sessionId } = params;
     await Session.findByIdAndDelete(sessionId);
-    await User.findByIdAndUpdate(userId, { $pull: { session: sessionId } });
+    await User.findByIdAndUpdate(userId, { $pull: { sessions: sessionId } }, {new: true});
     return res.status(204);
   } catch (error) {
     console.error(error);
@@ -93,12 +92,12 @@ export const toggleTaskStatus = async ({ params }: Request, res: Response) => {
   }
 };
 
-export const deleteTask = async ({params}: Request, res: Response) => {
+export const deleteTask = async ({ params }: Request, res: Response) => {
   try {
-    const { sessionId, taskId } = params
-    await Task.findByIdAndDelete(taskId)
-    await Session.findByIdAndUpdate( sessionId, {$pull: {tasks: taskId}})
-    return res.status(204)
+    const { sessionId, taskId } = params;
+    await Task.findByIdAndDelete(taskId);
+    await Session.findByIdAndUpdate(sessionId, { $pull: { tasks: taskId } });
+    return res.status(204);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "server error" });
