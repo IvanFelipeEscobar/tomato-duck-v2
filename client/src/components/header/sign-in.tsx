@@ -66,7 +66,7 @@ const Signin = () => {
     <span className="loading loading-spinner text-error"></span>
   ) : (
     <button
-      className="btn btn-error btn-sm rounded-3xl text-base-100"
+      className="btn btn-error btn-sm rounded-3xl text-base-100 my-2"
       onClick={async() => {
         await loginWithRedirect();
         

@@ -57,3 +57,12 @@ export const deleteOneTask = async (sessionId: string, taskId: string) =>
       "Content-Type": "application/json",
     },
   });
+ export const askChatBot = async (prompt: string) => 
+  await fetch(`${url}api/chatbot`, {
+    method: 'POST',
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({prompt})
+  })
+ 

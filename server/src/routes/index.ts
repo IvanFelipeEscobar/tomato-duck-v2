@@ -8,7 +8,7 @@ import {
   toggleTaskStatus,
   deleteTask,
 } from "../controllers";
-
+import chatSubmit from '../controllers/chat-bot'
 const router = express.Router();
 
 router.route("/api/user").post(addUser).get(getUser);
@@ -16,5 +16,5 @@ router.route("/api/:userId/session").put(addSession);
 router.route("/api/:userId/:sessionId").delete(deleteSession)
 router.route('/api/:sessionId').put(addTask)
 router.route("/api/:sessionId/:taskId").put(toggleTaskStatus).delete(deleteTask);
-
+router.route('/api/chatbot').post(chatSubmit)
 export default router;

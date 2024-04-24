@@ -102,7 +102,7 @@ const TaskList = ({ sess }: { sess: number }) => {
         onChange={(e) => setTxt(e.target.value)}
         value={txt}
       ></input>
-      {txt === "" ? (
+      {txt.trim() === "" ? (
         <button className="btn btn-info btn-sm ml-4  rounded-full text-base-100">
           <FaRegPenToSquare />
           Add task
