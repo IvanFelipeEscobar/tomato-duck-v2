@@ -65,8 +65,9 @@ const ChatBot = () => {
 
   return (
     <>
-      <div className="h-[275px] lg:h-[500px] shadow-2xl w-2/3 lg:max-w-5xl bg-base-200  bg-opacity-45 bg-no-repeat bg-center rounded-2xl lg:mr-12 overflow-auto scroll p-1 relative">
-        {chatLog.map((log) => (
+      <div className="h-[275px] lg:h-[500px] shadow-2xl w-2/3 lg:max-w-5xl bg-base-200  bg-opacity-45 bg-no-repeat bg-center rounded-2xl lg:mr-12 overflow-auto scroll p-1 relative min-w-80">
+        {isAuthenticated 
+        ? chatLog.map((log) => (
           <div
             key={log.id}
             className={
@@ -92,7 +93,10 @@ const ChatBot = () => {
               {log.message}
             </div>
           </div>
-        ))}
+        )) 
+      : (
+        <div className="text-center mt-12 italic">...please log in to use chat bot</div>
+      )}
         <form onSubmit={handleSubmitQuestion} className="absolute bottom-2 right-10 join rounded-full">
           <input
             type="text"

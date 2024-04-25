@@ -1,4 +1,6 @@
-const url = "http://localhost:3001/";
+const url: string = process.env.NODE_ENV === 'production'
+  ? 'https://tomato-duck-v2.onrender.com'
+  : 'http://localhost:3001';
 
 export const fetchUser = async (email: string) =>
   await fetch(`${url}api/user?email=${email}`, {

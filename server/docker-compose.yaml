@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  your-service-name:
+  tomato-duck: 
     build:
       context: .
       dockerfile: Dockerfile
@@ -12,3 +12,6 @@ services:
     environment:
       NODE_ENV: "production"
       MONGODB_URI: ${MONGODB_URI}
+      AUTH_SECRET: ${AUTH_SECRET}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+
