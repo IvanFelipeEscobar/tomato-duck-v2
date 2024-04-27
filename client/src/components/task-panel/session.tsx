@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { useAuth0 } from "@auth0/auth0-react";
+
 import useTaskStore from "../../lib/taskStore.ts";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import TaskList from "./task.tsx";
 
-import { deleteOneSession } from "../../lib/api.ts";
+// import { deleteOneSession } from "../../lib/api.ts";
 const SessionPanel = () => {
   const [del, setDel] = useState<string>("");
   const taskStore = useTaskStore((state) => ({
@@ -14,7 +14,6 @@ const SessionPanel = () => {
     setActiveSession: state.setActiveSession,
     deleteSession: state.deleteSession,
   }));
-  const { isAuthenticated } = useAuth0();
 
   return (
     <>
@@ -74,9 +73,9 @@ const SessionPanel = () => {
                         className="btn btn-warning btn-sm mt-4 rounded-full"
                         onClick={async (e) => {
                           e.stopPropagation();
-                          if (isAuthenticated) {
-                            deleteOneSession(taskStore.user._id, session._id);
-                          }
+                          // if (isAuthenticated) {
+                          //   deleteOneSession(taskStore.user._id, session._id);
+                          // }
                           taskStore.deleteSession(session._id);
                           setDel("");
                         }}

@@ -1,13 +1,13 @@
 import useTaskStore, { Task } from "../../lib/taskStore";
 import { useState } from "react";
-import { useAuth0 } from "@auth0/auth0-react";
+
 import { FaCheckCircle, FaWindowClose } from "react-icons/fa";
 import { FaRegPenToSquare } from "react-icons/fa6";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { v4 as uuidv4 } from "uuid";
-import { addNewTask, deleteOneTask, toggleTaskStatus } from "../../lib/api";
+// import { addNewTask, deleteOneTask, toggleTaskStatus } from "../../lib/api";
 const TaskList = ({ sess }: { sess: number }) => {
-  const { isAuthenticated } = useAuth0();
+
   const [txt, setTxt] = useState<string>("");
   const taskStore = useTaskStore((state) => ({
     user: state.user,
@@ -24,23 +24,23 @@ const TaskList = ({ sess }: { sess: number }) => {
   const handleAddTask = async () => {
     const sessionId = taskStore.activeSession;
     if (!sessionId) return; // No active session
-    if (isAuthenticated) {
-      try {
-        const res = await addNewTask(sessionId, txt
-        );
-        const newTaskAdded: Task = await res.json();
-        taskStore.addTask(sessionId, newTaskAdded);
-      } catch (error) {
-        console.error(error);
-      }
-    } else {
+    // if (isAuthenticated) {
+    //   try {
+    //     const res = await addNewTask(sessionId, txt
+    //     );
+    //     const newTaskAdded: Task = await res.json();
+    //     taskStore.addTask(sessionId, newTaskAdded);
+    //   } catch (error) {
+    //     console.error(error);
+    //   }
+    // } else {
       const task: Task = {
         _id: uuidv4(),
         task: txt,
         isDone: false,
       };
       taskStore.addTask(sessionId, task);
-    }
+    // }
     setTxt("");
   };
   return (
@@ -57,9 +57,9 @@ const TaskList = ({ sess }: { sess: number }) => {
             <button
               className="btn btn-circle bg-red-400 hover:bg-red-700 hover:skew-x-12 btn-xs"
               onClick={() => {
-                if(isAuthenticated){
-                  deleteOneTask(taskStore.user.sessions[sess]._id, t._id)
-                }
+                // if(isAuthenticated){
+                //   deleteOneTask(taskStore.user.sessions[sess]._id, t._id)
+                // }
                 taskStore.delTask(taskStore.user.sessions[sess]._id, t._id);
               }}
             >
@@ -69,9 +69,9 @@ const TaskList = ({ sess }: { sess: number }) => {
           <div
             className="flex justify-between bg-base-100 rounded-md shadow-md px-4 py-2 my-2 mx-4 w-full"
             onClick={() =>{
-              if(isAuthenticated){
-                toggleTaskStatus(taskStore.user.sessions[sess]._id, t._id)
-              }
+              // if(isAuthenticated){
+              //   toggleTaskStatus(taskStore.user.sessions[sess]._id, t._id)
+              // }
               taskStore.toggleTask(taskStore.user.sessions[sess]._id, t._id)}
             }
           >
