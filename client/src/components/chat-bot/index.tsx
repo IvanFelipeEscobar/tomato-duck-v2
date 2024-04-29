@@ -1,14 +1,14 @@
 import React, { useState } from "react";
-import { useAuth0 } from "@auth0/auth0-react";
+
 import { askChatBot } from "../../lib/api";
 import { BiArrowToTop } from "react-icons/bi";
+
 interface Message {
   id: number;
   role: string;
   message: string;
 }
 const ChatBot = () => {
-  const { isAuthenticated, user } = useAuth0();
   const welcomeMessages: string[] = [
     "Hi there! I'm your friendly chatbot duck. How can I assist you today?",
     "Quack quack! Welcome to the chat. I'm here to help you with anything you need.",
@@ -38,18 +38,19 @@ const ChatBot = () => {
 
   const handleSubmitQuestion = async (event: React.FormEvent) => {
     event.preventDefault();
-   
-    if (isAuthenticated && question.trim() !== "") {
-      setChatLog(chatlog => [
+
+    if (question.trim() !== "") {
+      setChatLog((chatlog) => [
         ...chatlog,
         { id: chatLog.length + 1, role: "tomato-user", message: question },
       ]);
       setQuestion("");
       try {
         const res = await askChatBot(question);
+        if(res.status === 429 ) console.log(res);
         const duckResponse = await res.json();
         console.log(duckResponse);
-        setChatLog(chatlog => [
+        setChatLog((chatlog) => [
           ...chatlog,
           {
             id: chatLog.length + 1,
@@ -66,8 +67,7 @@ const ChatBot = () => {
   return (
     <>
       <div className="h-[275px] lg:h-[500px] shadow-2xl w-2/3 lg:max-w-5xl bg-base-200  bg-opacity-45 bg-no-repeat bg-center rounded-2xl lg:mr-12 overflow-auto scroll p-1 relative min-w-80">
-        {isAuthenticated 
-        ? chatLog.map((log) => (
+        {chatLog.map((log) => (
           <div
             key={log.id}
             className={
@@ -77,7 +77,7 @@ const ChatBot = () => {
             <div className="chat-image avatar">
               <div className="w-10 rounded-full">
                 <img
-                  src={log.role === "duck" ? "/duck.png" : `${user?.picture}`}
+                  src={log.role === "duck" ? "/duck.png" : ``}
                   className={log.role === "duck" ? "scale-x-[-1]" : ""}
                   alt="user avatar"
                 />
@@ -93,11 +93,11 @@ const ChatBot = () => {
               {log.message}
             </div>
           </div>
-        )) 
-      : (
-        <div className="text-center mt-12 italic">...please log in to use chat bot</div>
-      )}
-        <form onSubmit={handleSubmitQuestion} className="absolute bottom-2 right-10 join rounded-full">
+        ))}
+        <form
+          onSubmit={handleSubmitQuestion}
+          className="absolute bottom-2 right-10 join rounded-full"
+        >
           <input
             type="text"
             value={question}
@@ -105,11 +105,8 @@ const ChatBot = () => {
             placeholder="Type your message..."
             className="input join-item "
           />
-          <button
-            type="submit"
-            className="btn btn-info join-item"
-          >
-           <BiArrowToTop size={24}/>
+          <button type="submit" className="btn btn-info join-item">
+            <BiArrowToTop size={24} />
           </button>
         </form>
       </div>

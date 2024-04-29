@@ -1,8 +1,8 @@
-import { useAuth0 } from "@auth0/auth0-react";
+
 import Timer from "../timer";
 import SessionPanel from "./session";
 import { MdAssignmentAdd } from "react-icons/md";
-import { addNewSession } from "../../lib/api.ts";
+// import { addNewSession } from "../../lib/api.ts";
 import { v4 as uuidv4 } from "uuid";
 import useTaskStore, { Session } from "../../lib/taskStore.ts";
 import { useState } from "react";
@@ -10,30 +10,29 @@ import ChatBot from "../chat-bot/index.tsx";
 
 const TaskPanel = () => {
   const [view, setView] = useState<string>("tomato");
-  const { isAuthenticated } = useAuth0();
   const { addSession, user } = useTaskStore();
 
   const handleAddSession = async () => {
-    if (isAuthenticated) {
-      try {
-        const res = await addNewSession(user._id);
-        const newSess: Session = await res.json();
-        addSession(newSess);
-      } catch (error) {
-        console.error(error);
-      }
-    } else {
+    // if (isAuthenticated) {
+    //   try {
+    //     const res = await addNewSession(user._id);
+    //     const newSess: Session = await res.json();
+    //     addSession(newSess);
+    //   } catch (error) {
+    //     console.error(error);
+    //   }
+    // } else {
       const session: Session = {
         _id: uuidv4(),
         tasks: [],
       };
       addSession(session);
-      console.log(user.sessions[user.sessions.length - 1].tasks.length);
+
     }
-  };
+  // };
   return (
     <>
-      <div className="pt-12 flex flex-col-reverse lg:justify-center lg:items-start gap-4 justify-end items-center lg:flex-row bg-error min-h-screen">
+      <div className="pt-12 flex flex-col-reverse  gap-4 justify-end items-center bg-error min-h-screen">
         <div className="md:w-3/4 lg:w-1/2 w-full px-1">
           <div>
             {user.sessions[user.sessions.length - 1].tasks.length === 0 ? (
