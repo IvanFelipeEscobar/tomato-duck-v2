@@ -1,11 +1,15 @@
 import { Request, Response } from "express";
 import { User, Session, Task } from "../models";
-import { signToken } from "../utils/auth";
+import { hashToken, signToken } from "../utils/auth";
 import bcrypt from "bcrypt";
-import jwt from 'jsonwebtoken'
-import 'dotenv/config'
-
-export const addUser = async ({ body }: Request, res: Response) => {
+import jwt from "jsonwebtoken";
+import "dotenv/config";
+import sendEmail from "../utils/sendEmail";
+import parser from "ua-parser-js";
+import { Token } from "../models/token";
+import crypto from "crypto";
+// --------------USER CONTROLLERS ----------
+export const addUser = async ({ body, headers }: Request, res: Response) => {
   try {
     const { userName, email, password } = body;
     if (!email || !password || !userName)
@@ -22,9 +26,13 @@ export const addUser = async ({ body }: Request, res: Response) => {
         message:
           "Account with this email already exists, please log in to your account",
       });
+    const ua = parser(headers["user-agent"]);
+    const userAgent = [ua.ua];
+
     const newUser = await User.create({
       userName,
       email,
+      userAgent,
       password,
       sessions: [],
     });
@@ -81,7 +89,7 @@ export const loginUser = async ({ body }: Request, res: Response) => {
   }
 };
 
-export const logOutUser = async (req: Request, res: Response) => {
+export const logOutUser = async (_: Request, res: Response) => {
   res.cookie("token", "", {
     path: "/",
     httpOnly: true,
@@ -95,14 +103,14 @@ export const logOutUser = async (req: Request, res: Response) => {
 export const getUser = async ({ user }: Request, res: Response) => {
   try {
     const { _id } = user;
-    const activeUser = await User.findById(_id, {
+    const activeUser = await User.findById(_id).populate({
       path: "sessions",
       populate: {
         path: "tasks",
         select: "-__v",
       },
     });
-    if (!user) res.status(404).json({ message: `user not found` });
+    if (!user) return res.status(404).json({ message: `user not found` });
     return res.status(200).json(activeUser);
   } catch (error) {
     console.error(error);
@@ -122,20 +130,110 @@ export const editUser = async ({ user, body }: Request, res: Response) => {
         new: true,
       }
     );
-    if(!editedUser) return res.status(404).json({message: 'user to be edited not found'});
-    return res.status(201).json(editedUser)
+    if (!editedUser)
+      return res.status(404).json({ message: "user to be edited not found" });
+    return res.status(201).json(editedUser);
   } catch (error) {
     res.status(500).json;
   }
 };
 
-export const loginStatus = async ({cookies}: Request, res: Response) => {
-const {token }= cookies
-if(!token) return res.json(false)
-const verify = jwt.verify(token, process.env.JWT_SECRET!)
-return verify ? res.json(true) :  res.json(false)
-}
+export const loginStatus = async ({  cookies }: Request, res: Response) => {
+  const { token } = cookies;
+  if (!token) return res.json(false);
+  const verify = jwt.verify(token, process.env.JWT_SECRET!);
+  return verify ? res.json(true) : res.json(false);
+};
 
+export const verifyUser = async ({params}: Request, res: Response ) => {
+const { verificationToken} = params
+const hashedToken = hashToken(verificationToken)
+try {
+  const userToken = await Token.findOne({
+    vToken: hashedToken,
+    expiresAt: {$gt: Date.now()}
+  })
+  if (!userToken) return res.status(404).json({message: 'invalid or expired token'})
+    const user = await User.findById(userToken.userId)
+  if(!user) return res.status(404).json({message: 'user not found'})
+  if(user.isVerified) return res.status(400).json({message: 'User is already verified'})
+    user.isVerified = true
+  await user.save()
+   res.status(200).json({message: "Account verification succesful!"})
+
+} catch (error) {
+  console.error(error)
+  return res.status(500).json({message: 'server error'})
+}
+}
+//------------EMAIL STUFF-------------------
+
+export const autoEmailSend = async (req: Request, res: Response) => {
+  const { subject, send_to, reply_to, template, url } = req.body;
+  if (!subject || !send_to || !reply_to || !template)
+    return res.status(500).json({ message: "missing email parameters" });
+  const user = await User.findOne({ email: send_to });
+  if (!user) return res.status(404).json({ message: `user not found` });
+  const send_from = process.env.EMAIL_USER!;
+  const name = user.userName;
+  const link = `http://localhost:3001${url}`;
+  try {
+    await sendEmail(
+      subject,
+      send_to,
+      send_from,
+      reply_to,
+      template,
+      name,
+      link
+    );
+    return res.status(200).json({ message: "email sent" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "server error" });
+  }
+};
+
+export const sendVerifyEmail = async ({ user }: Request, res: Response) => {
+  try {
+    const verUser = await User.findById(user._id);
+    if (!verUser) return res.status(404).json({ message: "user not found" });
+    if (verUser.isVerified)
+      return res.status(400).json({ message: "User already verified" });
+    let token = await Token.findOne({ userId: verUser._id });
+    if (token) await token.deleteOne();
+    const verificationToken = crypto.randomBytes(32).toString("hex") + user._id;
+    const hashedToken = hashToken(verificationToken);
+    await new Token({
+      userId: user._id,
+      vToken: hashedToken,
+      createdAt: Date.now(),
+      expiresAt: Date.now() + 60 * 60 * 1000,
+    }).save();
+
+    const verificationUrl = `http://localhost:3001/api/verify/${verificationToken}`;
+    const subject = "Verify your account";
+    const send_to = user.email
+    const send_from = process.env.EMAIL_USER!
+    const reply_to = 'noreply@tomato.duck'
+    const template = 'verifyEmail'
+    const name = user.userName
+    const link = verificationUrl
+    await sendEmail(
+      subject,
+      send_to,
+      send_from,
+      reply_to,
+      template,
+      name,
+      link
+    );
+    return res.status(200).json({message: 'Account verification email sent'})
+  } catch (error) {
+    console.error(error);
+  }
+};
+// ----------- TASK STUFF --------------------
 export const addSession = async ({ params }: Request, res: Response) => {
   try {
     const { userId } = params;
