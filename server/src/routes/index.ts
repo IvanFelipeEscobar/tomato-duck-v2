@@ -12,7 +12,8 @@ import {
   loginStatus,
   autoEmailSend,
   sendVerifyEmail,
-  verifyUser
+  verifyUser,
+  forgotPassword
 } from "../controllers";
 import chatSubmit from '../controllers/chat-bot'
 import chatLimiter from "../utils/chatBotLimiter";
@@ -27,6 +28,7 @@ router.route('/api/logout').get(logOutUser)
 router.route('/api/autoemail').post(authMiddleware, autoEmailSend)
 router.route('/api/sendVerifyEmail').post(authMiddleware, sendVerifyEmail)
 router.route('/api/verify/:verificationToken').put(verifyUser)
+router.route('/api/forgotpassword').put(forgotPassword)
 
 router.route("/api/:userId/session").put(addSession);
 router.route("/api/:userId/:sessionId").delete(deleteSession)
