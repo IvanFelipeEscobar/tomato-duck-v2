@@ -5,11 +5,10 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
 import sendEmail from "../utils/sendEmail";
-import parser from "ua-parser-js";
 import { Token } from "../models/token";
 import crypto from "crypto";
 // --------------USER CONTROLLERS ----------
-export const addUser = async ({ body, headers }: Request, res: Response) => {
+export const addUser = async ({ body }: Request, res: Response) => {
   try {
     const { userName, email, password } = body;
     if (!email || !password || !userName)
@@ -26,13 +25,10 @@ export const addUser = async ({ body, headers }: Request, res: Response) => {
         message:
           "Account with this email already exists, please log in to your account",
       });
-    const ua = parser(headers["user-agent"]);
-    const userAgent = [ua.ua];
 
     const newUser = await User.create({
       userName,
       email,
-      userAgent,
       password,
       sessions: [],
     });
@@ -202,7 +198,60 @@ export const forgotPassword = async (req: Request, res: Response) => {
       name,
       link
     );
-    return res.status(200).json({ message: "Password reset, email has been sent" });
+    return res
+      .status(200)
+      .json({ message: "Password reset, email has been sent" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "server error" });
+  }
+};
+
+export const resetPassword = async (req: Request, res: Response) => {
+  try {
+    const { resetToken } = req.params;
+    const { password } = req.body;
+    const hashedToken = hashToken(resetToken);
+    const userToken = await Token.findOne({
+      rToken: hashedToken,
+      expiresAt: { $gt: Date.now() },
+    });
+    if (!userToken)
+      return res.status(404).json({ message: "Tokens is invalid or expired" });
+    const user = await User.findById(userToken.userId);
+    if (!user) return res.status(404).json({ message: "user not found" });
+    user.password = password;
+    await user.save();
+
+    return res
+      .status(200)
+      .json({ message: "Password reset was succesful, please log in" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "server error" });
+  }
+};
+
+export const changePassword = async (req: Request, res: Response) => {
+  try {
+    const { oldPassword, password } = req.body;
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: "user not found" });
+    if (!oldPassword || !password)
+      return res
+        .status(400)
+        .json({ message: "Please enter both old and new passwords" });
+    const validatePassword = await bcrypt.compare(oldPassword, user.password);
+    if (validatePassword) {
+      user.password = password;
+      await user.save();
+      return res.status(200).json({
+        message:
+          "Password reset was succesful, please log in again with your new credentials",
+      });
+    } else {
+      return res.status(400).json({ message: "Old password is incorrect" });
+    }
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "server error" });

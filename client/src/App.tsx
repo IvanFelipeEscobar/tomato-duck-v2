@@ -1,13 +1,16 @@
+import { Outlet } from "react-router-dom";
 import Footer from "./components/footer";
 
 import Nav from "./components/header";
-import TaskPanel from "./components/task-panel";
+import { ToastContainer } from "react-toastify";
+
 
 function App() {
   return (
     <>
       <Nav />
-      <TaskPanel />
+      <ToastContainer/>
+      <Outlet />
       <Footer/>
 
     </>
