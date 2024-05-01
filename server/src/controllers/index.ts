@@ -5,11 +5,10 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
 import sendEmail from "../utils/sendEmail";
-import parser from "ua-parser-js";
 import { Token } from "../models/token";
 import crypto from "crypto";
 // --------------USER CONTROLLERS ----------
-export const addUser = async ({ body, headers }: Request, res: Response) => {
+export const addUser = async ({ body }: Request, res: Response) => {
   try {
     const { userName, email, password } = body;
     if (!email || !password || !userName)
@@ -26,13 +25,10 @@ export const addUser = async ({ body, headers }: Request, res: Response) => {
         message:
           "Account with this email already exists, please log in to your account",
       });
-    const ua = parser(headers["user-agent"]);
-    const userAgent = [ua.ua];
 
     const newUser = await User.create({
       userName,
       email,
-      userAgent,
       password,
       sessions: [],
     });
@@ -138,34 +134,129 @@ export const editUser = async ({ user, body }: Request, res: Response) => {
   }
 };
 
-export const loginStatus = async ({  cookies }: Request, res: Response) => {
+export const loginStatus = async ({ cookies }: Request, res: Response) => {
   const { token } = cookies;
   if (!token) return res.json(false);
   const verify = jwt.verify(token, process.env.JWT_SECRET!);
   return verify ? res.json(true) : res.json(false);
 };
 
-export const verifyUser = async ({params}: Request, res: Response ) => {
-const { verificationToken} = params
-const hashedToken = hashToken(verificationToken)
-try {
-  const userToken = await Token.findOne({
-    vToken: hashedToken,
-    expiresAt: {$gt: Date.now()}
-  })
-  if (!userToken) return res.status(404).json({message: 'invalid or expired token'})
-    const user = await User.findById(userToken.userId)
-  if(!user) return res.status(404).json({message: 'user not found'})
-  if(user.isVerified) return res.status(400).json({message: 'User is already verified'})
-    user.isVerified = true
-  await user.save()
-   res.status(200).json({message: "Account verification succesful!"})
+export const verifyUser = async ({ params }: Request, res: Response) => {
+  const { verificationToken } = params;
+  const hashedToken = hashToken(verificationToken);
+  try {
+    const userToken = await Token.findOne({
+      vToken: hashedToken,
+      expiresAt: { $gt: Date.now() },
+    });
+    if (!userToken)
+      return res.status(404).json({ message: "invalid or expired token" });
+    const user = await User.findById(userToken.userId);
+    if (!user) return res.status(404).json({ message: "user not found" });
+    if (user.isVerified)
+      return res.status(400).json({ message: "User is already verified" });
+    user.isVerified = true;
+    await user.save();
+    res.status(200).json({ message: "Account verification succesful!" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "server error" });
+  }
+};
+export const forgotPassword = async (req: Request, res: Response) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user)
+      return res
+        .status(404)
+        .json({ message: "no user associated with this email" });
+    let token = await Token.findOne({ userId: user._id });
+    if (token) return await token.deleteOne();
+    const resetToken = crypto.randomBytes(32).toString("hex") + user._id;
+    const hashedToken = hashToken(resetToken);
+    await new Token({
+      userId: user._id,
+      rToken: hashedToken,
+      createdAt: Date.now(),
+      expiresAt: Date.now() + 60 * 60 * 1000,
+    }).save();
+    const resetUrl = `http://localhost:3001/${resetToken}`;
+    const subject = "Tomato-Duck: Reset your password";
+    const send_to = user.email;
+    const send_from = process.env.EMAIL_USER!;
+    const reply_to = "noreply@tomato.duck";
+    const template = "forgotPassword";
+    const name = user.userName;
+    const link = resetUrl;
+    await sendEmail(
+      subject,
+      send_to,
+      send_from,
+      reply_to,
+      template,
+      name,
+      link
+    );
+    return res
+      .status(200)
+      .json({ message: "Password reset, email has been sent" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "server error" });
+  }
+};
 
-} catch (error) {
-  console.error(error)
-  return res.status(500).json({message: 'server error'})
-}
-}
+export const resetPassword = async (req: Request, res: Response) => {
+  try {
+    const { resetToken } = req.params;
+    const { password } = req.body;
+    const hashedToken = hashToken(resetToken);
+    const userToken = await Token.findOne({
+      rToken: hashedToken,
+      expiresAt: { $gt: Date.now() },
+    });
+    if (!userToken)
+      return res.status(404).json({ message: "Tokens is invalid or expired" });
+    const user = await User.findById(userToken.userId);
+    if (!user) return res.status(404).json({ message: "user not found" });
+    user.password = password;
+    await user.save();
+
+    return res
+      .status(200)
+      .json({ message: "Password reset was succesful, please log in" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "server error" });
+  }
+};
+
+export const changePassword = async (req: Request, res: Response) => {
+  try {
+    const { oldPassword, password } = req.body;
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: "user not found" });
+    if (!oldPassword || !password)
+      return res
+        .status(400)
+        .json({ message: "Please enter both old and new passwords" });
+    const validatePassword = await bcrypt.compare(oldPassword, user.password);
+    if (validatePassword) {
+      user.password = password;
+      await user.save();
+      return res.status(200).json({
+        message:
+          "Password reset was succesful, please log in again with your new credentials",
+      });
+    } else {
+      return res.status(400).json({ message: "Old password is incorrect" });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "server error" });
+  }
+};
 //------------EMAIL STUFF-------------------
 
 export const autoEmailSend = async (req: Request, res: Response) => {
@@ -212,13 +303,13 @@ export const sendVerifyEmail = async ({ user }: Request, res: Response) => {
     }).save();
 
     const verificationUrl = `http://localhost:3001/api/verify/${verificationToken}`;
-    const subject = "Verify your account";
-    const send_to = user.email
-    const send_from = process.env.EMAIL_USER!
-    const reply_to = 'noreply@tomato.duck'
-    const template = 'verifyEmail'
-    const name = user.userName
-    const link = verificationUrl
+    const subject = "Tomato-Duck: Verify your account";
+    const send_to = user.email;
+    const send_from = process.env.EMAIL_USER!;
+    const reply_to = "noreply@tomato.duck";
+    const template = "verifyEmail";
+    const name = user.userName;
+    const link = verificationUrl;
     await sendEmail(
       subject,
       send_to,
@@ -228,7 +319,7 @@ export const sendVerifyEmail = async ({ user }: Request, res: Response) => {
       name,
       link
     );
-    return res.status(200).json({message: 'Account verification email sent'})
+    return res.status(200).json({ message: "Account verification email sent" });
   } catch (error) {
     console.error(error);
   }
