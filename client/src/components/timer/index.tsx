@@ -18,7 +18,7 @@ export default function Timer() {
 
   return (
     <div>
-      <div className="flex gap-5 mb-2">
+      <div className="flex sm:gap-5 gap-2 mb-2">
         {timerTime.map((t, i) => (
           <button
             key={`btn${i}`}
@@ -40,8 +40,8 @@ export default function Timer() {
         ))}
       </div>
 
-      <div className="flex flex-col justify-center items-center">
-        <div className="h-20 flex items-center font-mono bg-opacity-30 text-neutral font-extrabold justify-center gap-1 text-5xl shadow-2xl mt-4 inset-0 w-48 bg-base-300 rounded-2xl">
+      <div className="flex h-80 flex-col justify-center items-center bg-[url('/favicon.ico')] bg-contain bg-no-repeat bg-center ">
+        <div className="h-20 flex items-center font-mono bg-opacity-50 text-neutral font-extrabold justify-center gap-1 text-5xl shadow-2xl mt-16 inset-0 w-48 bg-base-300 rounded-2xl">
           {seconds !== 0 || minutes !== 0 ? (
             <>
               <span>{minutes}</span>
@@ -62,26 +62,27 @@ export default function Timer() {
         </div>
         <div className="flex gap-3 my-2">
           <div className="tooltip" data-tip="Start timer">
-          <button className="btn btn-sm btn-circle bg-opacity-50 border-0">
-            <LuPlayCircle size={24} />
-          </button>
+            <button className="btn btn-sm btn-circle bg-opacity-50 border-0">
+              <LuPlayCircle size={24} />
+            </button>
           </div>
           <div className="tooltip" data-tip="Restart timer">
-          <button
-            className="btn btn-sm btn-circle bg-opacity-50 border-0"
-            onClick={() => {
-              const time = new Date();
-              time.setSeconds(time.getSeconds() + timer);
-              restart(time);
-            }}
-          >
-            <LuTimerReset size={24} color="red" />
-          </button>
+            <button
+              className="btn btn-sm btn-circle bg-opacity-50 border-0"
+              onClick={() => {
+                const time = new Date();
+                time.setSeconds(time.getSeconds() + timer);
+                restart(time);
+              }}
+            >
+              <LuTimerReset size={24} color="red" />
+            </button>
           </div>
           <div className="tooltip" data-tip="Stop timer">
-          <button className="btn btn-sm btn-circle bg-opacity-50 border-0">
-            <LuStopCircle size={24} />
-          </button></div>
+            <button className="btn btn-sm btn-circle bg-opacity-50 border-0">
+              <LuStopCircle size={24} />
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -12,7 +12,7 @@ const {prompt} = body
 try {
     const genResponse = await openai.chat.completions.create({
         model: 'gpt-3.5-turbo-0125',
-        messages: [{role: 'system', content: prompt}]
+        messages: [{role: 'system', content:`[context: You are a chat-bot assistant named quack-bot. the ui already took care of initial greeting, just answer the question keep to one paragraph, or less. maybe make duck puns every once in a while] ${prompt}`}]
     })
     const botAnswer = genResponse.choices[0].message
     return res.status(201).json(botAnswer)

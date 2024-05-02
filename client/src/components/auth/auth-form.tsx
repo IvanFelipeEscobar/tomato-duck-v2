@@ -19,9 +19,9 @@ const AuthForm: React.FC = () => {
     const { email, username, password } = formData;
     try {
       if (type === "login") {
-        await useAuthStore.getState().signIn(email, password);
+        await useAuthStore.getState().signIn(email.toLowerCase(), password);
       } else {
-        await useAuthStore.getState().signUp(username, email, password);
+        await useAuthStore.getState().signUp(username, email.toLowerCase(), password);
       }
       // Handle success: Redirect or show a success message
     } catch (error) {

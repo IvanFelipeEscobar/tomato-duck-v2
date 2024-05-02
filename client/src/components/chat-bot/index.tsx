@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-
+import { v4 as uuidv4 } from 'uuid';
 import { askChatBot } from "../../lib/api";
 import { BiArrowToTop } from "react-icons/bi";
 
 interface Message {
-  id: number;
+  id: string;
   role: string;
   message: string;
+  time: string;
 }
 const ChatBot = () => {
   const welcomeMessages: string[] = [
@@ -27,12 +28,14 @@ const ChatBot = () => {
     return welcomeMessages[randomIndex];
   };
 
+  const currentTime = new Date().toLocaleString();
   const [question, setQuestion] = useState("");
   const [chatLog, setChatLog] = useState<Message[]>([
     {
-      id: 1,
+      id: uuidv4()+'duck-welcome',
       role: "duck",
       message: getRandomWelcomeMessage(),
+      time: currentTime,
     },
   ]);
 
@@ -42,31 +45,48 @@ const ChatBot = () => {
     if (question.trim() !== "") {
       setChatLog((chatlog) => [
         ...chatlog,
-        { id: chatLog.length + 1, role: "tomato-user", message: question },
+        {
+          id: uuidv4()+'user',
+          role: "tomato-user",
+          message: question,
+          time: currentTime,
+        },
       ]);
       setQuestion("");
       try {
         const res = await askChatBot(question);
-        if(res.status === 429 ) console.log(res);
+        if (res.status === 429) {
+          setChatLog((chatlog) => [
+            ...chatlog,
+            {
+              id: uuidv4()+'duck-requestlimit',
+              role: "duck",
+              message: "Sorry, the max number of request has been reached. Try again in 5 minutes",
+              time: currentTime,
+            },
+          ])
+        }
         const duckResponse = await res.json();
         console.log(duckResponse);
         setChatLog((chatlog) => [
           ...chatlog,
           {
-            id: chatLog.length + 1,
+            id: uuidv4()+'duck',
             role: "duck",
             message: duckResponse.content,
+            time: currentTime,
           },
         ]);
       } catch (error) {
-        console.error(error);
+        console.log(error);
       }
     }
   };
 
   return (
-    <>
-      <div className="h-[275px] lg:h-[500px] shadow-2xl w-2/3 lg:max-w-5xl bg-base-200  bg-opacity-45 bg-no-repeat bg-center rounded-2xl lg:mr-12 overflow-auto scroll p-1 relative min-w-80">
+    < div className="border flex flex-col gap-2 items-center">
+      <div className="text-3xl italic py-2 ml-5 font-mono">Duck-Gpt</div>
+      <div className="h-[275px] lg:h-[500px] shadow-2xl w-2/3 lg:max-w-5xl bg-base-200  bg-opacity-45 bg-no-repeat bg-center rounded-2xl lg:mr-12 overflow-auto scroll p-1 relative min-w-80 border">
         {chatLog.map((log) => (
           <div
             key={log.id}
@@ -74,10 +94,14 @@ const ChatBot = () => {
               log.role === "duck" ? "chat chat-start" : "chat chat-end"
             }
           >
+            <div className="chat-header">
+              {log.role === "duck" ? "Quack-bot" : "User"}
+              <time className="text-xs opacity-50 pl-4">{log.time}</time>
+            </div>
             <div className="chat-image avatar">
               <div className="w-10 rounded-full">
                 <img
-                  src={log.role === "duck" ? "/duck.png" : ``}
+                  src={log.role === "duck" ? "/duck.png" : `tomato-24.svg`}
                   className={log.role === "duck" ? "scale-x-[-1]" : ""}
                   alt="user avatar"
                 />
@@ -86,7 +110,7 @@ const ChatBot = () => {
             <div
               className={
                 log.role === "duck"
-                  ? "chat-bubble bg-warning"
+                  ? "chat-bubble bg-neutral"
                   : "chat-bubble bg-primary"
               }
             >
@@ -94,23 +118,20 @@ const ChatBot = () => {
             </div>
           </div>
         ))}
-        <form
-          onSubmit={handleSubmitQuestion}
-          className="absolute bottom-2 right-10 join rounded-full"
-        >
-          <input
-            type="text"
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            placeholder="Type your message..."
-            className="input join-item "
-          />
-          <button type="submit" className="btn btn-info join-item">
-            <BiArrowToTop size={24} />
-          </button>
-        </form>
       </div>
-    </>
+      <form onSubmit={handleSubmitQuestion} className="join rounded-xl">
+        <input
+          type="text"
+          value={question}
+          onChange={(e) => setQuestion(e.target.value)}
+          placeholder="Type your message..."
+          className="input join-item "
+        />
+        <button type="submit" className="btn btn-primary join-item">
+          <BiArrowToTop size={24} />
+        </button>
+      </form>
+    </div>
   );
 };
 

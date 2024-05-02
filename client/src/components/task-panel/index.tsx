@@ -1,4 +1,3 @@
-
 import Timer from "../timer";
 import SessionPanel from "./session";
 import { MdAssignmentAdd } from "react-icons/md";
@@ -22,17 +21,16 @@ const TaskPanel = () => {
     //     console.error(error);
     //   }
     // } else {
-      const session: Session = {
-        _id: uuidv4(),
-        tasks: [],
-      };
-      addSession(session);
-
-    }
+    const session: Session = {
+      _id: uuidv4(),
+      tasks: [],
+    };
+    addSession(session);
+  };
   // };
   return (
     <>
-      <div className="pt-12 flex flex-col-reverse  gap-4 justify-end items-center bg-error min-h-screen">
+      <div className="pt-16 sm:pt-12 flex flex-col-reverse  gap-4 justify-end items-center bg-error min-h-screen">
         <div className="md:w-3/4 lg:w-1/2 w-full px-1">
           <div>
             {user.sessions[user.sessions.length - 1].tasks.length === 0 ? (
@@ -60,21 +58,26 @@ const TaskPanel = () => {
           </div>
           <SessionPanel />
         </div>
-        <div className={view === 'tomato' ? '' : 'hidden'}><Timer /> </div>
-         <div className={view === 'duck' ? '' : 'hidden'}><ChatBot />
-          </div>
+        <div className={view === "tomato" ? "" : "hidden"}>
+          <Timer />{" "}
+        </div>
+        <div className={view === "duck" ? "" : "hidden"}>
+          <ChatBot />
+        </div>
       </div>
+
       <button
         onClick={() => setView("tomato")}
-        className="btn btn-circle bg-base-200 border-neutral absolute top-48 right-4 shadow-xl focus:bg-slate-500"
+        className="btn btn-circle bg-base-200 border-neutral absolute sm:top-48 sm:right-4 top-16 right-4 shadow-xl focus:bg-slate-500"
       >
         <div className="tooltip" data-tip="Tomato timer">
           <img src="/tomato-24.svg" alt="tomato" className="w-10" />
         </div>{" "}
       </button>
+
       <button
         onClick={() => setView("duck")}
-        className="btn btn-circle bg-base-200 border-neutral absolute top-32 right-4 shadow-xl focus:bg-slate-500"
+        className="btn btn-circle bg-base-200 border-neutral absolute sm:top-32 sm:right-4 top-16 right-20 shadow-xl focus:bg-slate-500"
       >
         <div className="tooltip" data-tip="Ask a duck">
           <img src="/duck.png" alt="duck" className="w-10" />
