@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { v4 as uuidv4 } from 'uuid';
+import React, { useEffect, useRef, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import { askChatBot } from "../../lib/api";
 import { BiArrowToTop } from "react-icons/bi";
 
@@ -30,15 +30,28 @@ const ChatBot = () => {
 
   const currentTime = new Date().toLocaleString();
   const [question, setQuestion] = useState("");
-  const [chatLog, setChatLog] = useState<Message[]>([
+  const [chatLog, setChatLog] = useState<Message[]>(() => {
+    const storedChatLog = localStorage.getItem("chat");
+    return storedChatLog ? JSON.parse(storedChatLog) :[
     {
-      id: uuidv4()+'duck-welcome',
+      id: uuidv4() + "duck-welcome",
       role: "duck",
       message: getRandomWelcomeMessage(),
       time: currentTime,
     },
-  ]);
+  ]});
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
+  const scrollToBottom = () => {
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+    localStorage.setItem("chat", JSON.stringify(chatLog));
+  }, [chatLog]);
   const handleSubmitQuestion = async (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -46,7 +59,7 @@ const ChatBot = () => {
       setChatLog((chatlog) => [
         ...chatlog,
         {
-          id: uuidv4()+'user',
+          id: uuidv4() + "user",
           role: "tomato-user",
           message: question,
           time: currentTime,
@@ -59,19 +72,20 @@ const ChatBot = () => {
           setChatLog((chatlog) => [
             ...chatlog,
             {
-              id: uuidv4()+'duck-requestlimit',
+              id: uuidv4() + "duck-requestlimit",
               role: "duck",
-              message: "Sorry, the max number of request has been reached. Try again in 5 minutes",
+              message:
+                "Sorry, the max number of request has been reached. Try again in 5 minutes",
               time: currentTime,
             },
-          ])
+          ]);
         }
         const duckResponse = await res.json();
         console.log(duckResponse);
         setChatLog((chatlog) => [
           ...chatlog,
           {
-            id: uuidv4()+'duck',
+            id: uuidv4() + "duck",
             role: "duck",
             message: duckResponse.content,
             time: currentTime,
@@ -84,9 +98,10 @@ const ChatBot = () => {
   };
 
   return (
-    < div className="border flex flex-col gap-2 items-center">
+    <div className="flex flex-col gap-2 items-center relative">
+      <div className="absolute top-9 italic font-serif right-20 hidden sm:block">Quack Your Way to Solutions with Duck-GPT</div>
       <div className="text-3xl italic py-2 ml-5 font-mono">Duck-Gpt</div>
-      <div className="h-[275px] lg:h-[500px] shadow-2xl w-2/3 lg:max-w-5xl bg-base-200  bg-opacity-45 bg-no-repeat bg-center rounded-2xl lg:mr-12 overflow-auto scroll p-1 relative min-w-80 border">
+      <div className="max-h-[275px] lg:max-h-[500px] shadow-2xl w-2/3 max-w-3xl bg-base-200  bg-opacity-45 bg-no-repeat bg-center rounded-2xl lg:mr-12 overflow-auto scroll p-1 relative min-w-80 border-2">
         {chatLog.map((log) => (
           <div
             key={log.id}
@@ -118,6 +133,8 @@ const ChatBot = () => {
             </div>
           </div>
         ))}
+
+        <div ref={chatEndRef}></div>
       </div>
       <form onSubmit={handleSubmitQuestion} className="join rounded-xl">
         <input

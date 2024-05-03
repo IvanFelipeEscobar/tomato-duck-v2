@@ -48,6 +48,23 @@ export const logOutUser = async () =>
       "Content-Type": "application/json",
     },
   });
+
+export const sendVerifyEmail = async () =>
+  await fetch(`${url}api/sendVerifyEmail`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+export const verifyAccount = async (verificationToken: string) =>
+  await fetch(`${url}api/verify/${verificationToken}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
 //------------------- Task/Session Stuff
 export const addNewSession = async (userId: string) =>
   await fetch(`${url}api/${userId}/session`, {

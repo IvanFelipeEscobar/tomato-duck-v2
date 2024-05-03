@@ -7,6 +7,7 @@ import useTaskStore, { Session } from "../../lib/taskStore.ts";
 import { useState } from "react";
 import ChatBot from "../chat-bot/index.tsx";
 
+
 const TaskPanel = () => {
   const [view, setView] = useState<string>("tomato");
   const { addSession, user } = useTaskStore();
@@ -29,7 +30,7 @@ const TaskPanel = () => {
   };
   // };
   return (
-    <>
+    <> 
       <div className="pt-16 sm:pt-12 flex flex-col-reverse  gap-4 justify-end items-center bg-error min-h-screen">
         <div className="md:w-3/4 lg:w-1/2 w-full px-1">
           <div>

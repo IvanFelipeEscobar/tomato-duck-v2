@@ -6,14 +6,14 @@ export default function Timer() {
   const time = new Date();
   const [active, setActive] = useState(0);
   const [timer, setTimer] = useState<number>(300);
-  const { seconds, minutes, restart } = useTimer({
+  const { seconds, minutes, restart, pause, resume } = useTimer({
     expiryTimestamp: time,
     onExpire: () => console.warn("onExpire called"),
   });
   const timerTime = [
-    { name: `Tomato Time`, add: 1500 },
-    { name: `Short Break`, add: 300 },
-    { name: `Long Break`, add: 600 },
+    { name: `Tomato Time`, add: 1500, time: '25 minutes' },
+    { name: `Short Break`, add: 300, time: '10 minutes' },
+    { name: `Long Break`, add: 600, time: '5 minutes' },
   ];
 
   return (
@@ -34,14 +34,14 @@ export default function Timer() {
               setTimer(t.add);
               setActive(i);
             }}
-          >
-            {t.name}
+          ><div className="tooltip" data-tip={t.time}>{t.name}</div>
+            
           </button>
         ))}
       </div>
 
       <div className="flex h-80 flex-col justify-center items-center bg-[url('/favicon.ico')] bg-contain bg-no-repeat bg-center ">
-        <div className="h-20 flex items-center font-mono bg-opacity-50 text-neutral font-extrabold justify-center gap-1 text-5xl shadow-2xl mt-16 inset-0 w-48 bg-base-300 rounded-2xl">
+        <div className="h-20 flex items-center font-mono bg-opacity-60 text-neutral font-extrabold justify-center gap-1 text-5xl mt-16 border border-red-500 w-48 bg-base-300 rounded-2xl shadow-inner">
           {seconds !== 0 || minutes !== 0 ? (
             <>
               <span>{minutes}</span>
@@ -62,7 +62,7 @@ export default function Timer() {
         </div>
         <div className="flex gap-3 my-2">
           <div className="tooltip" data-tip="Start timer">
-            <button className="btn btn-sm btn-circle bg-opacity-50 border-0">
+            <button onClick={resume}className="btn btn-sm btn-circle bg-opacity-50 border-0">
               <LuPlayCircle size={24} />
             </button>
           </div>
@@ -79,7 +79,7 @@ export default function Timer() {
             </button>
           </div>
           <div className="tooltip" data-tip="Stop timer">
-            <button className="btn btn-sm btn-circle bg-opacity-50 border-0">
+            <button onClick={pause} className="btn btn-sm btn-circle bg-opacity-50 border-0">
               <LuStopCircle size={24} />
             </button>
           </div>

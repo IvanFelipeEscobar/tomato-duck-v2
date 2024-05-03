@@ -27,7 +27,7 @@ const SessionPanel = () => {
 
       {taskStore.user.sessions.map((session, i) => (
         <div key={session._id}>
-          <div className="flex items-start md:gap-3">
+          <div className="flex items-start md:gap-3 mb-6">
             <div className="collapse collapse-plus bg-base-200 bg-opacity-70 shadow-md">
               <input
                 type="radio"

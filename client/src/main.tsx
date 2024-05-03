@@ -13,7 +13,6 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <TaskPanel /> },
       { path: "/signup", element: <Signin /> },
-      // {path: '*', element: <NotFound/>}
     ],
   },
 ]);
