@@ -8,9 +8,9 @@ import sendEmail from "../utils/sendEmail";
 import { Token } from "../models/token";
 import crypto from "crypto";
 // --------------USER CONTROLLERS ----------
-export const addUser = async ({ body }: Request, res: Response) => {
+export const addUser = async (req: Request, res: Response) => {
   try {
-    const { userName, email, password } = body;
+    const { userName, email, password } = req.body;
     if (!email || !password || !userName)
       return res
         .status(400)
@@ -51,8 +51,8 @@ export const addUser = async ({ body }: Request, res: Response) => {
   }
 };
 
-export const loginUser = async ({ body }: Request, res: Response) => {
-  const { email, password } = body;
+export const loginUser = async (req: Request, res: Response) => {
+  const { email, password } = req.body;
   if (!email || !password)
     return res
       .status(400)
@@ -163,49 +163,7 @@ export const verifyUser = async ({ params }: Request, res: Response) => {
     return res.status(500).json({ message: "server error" });
   }
 };
-export const forgotPassword = async (req: Request, res: Response) => {
-  const { email } = req.body;
-  try {
-    const user = await User.findOne({ email });
-    if (!user)
-      return res
-        .status(404)
-        .json({ message: "no user associated with this email" });
-    let token = await Token.findOne({ userId: user._id });
-    if (token) return await token.deleteOne();
-    const resetToken = crypto.randomBytes(32).toString("hex") + user._id;
-    const hashedToken = hashToken(resetToken);
-    await new Token({
-      userId: user._id,
-      rToken: hashedToken,
-      createdAt: Date.now(),
-      expiresAt: Date.now() + 60 * 60 * 1000,
-    }).save();
-    const resetUrl = `http://localhost:3001/${resetToken}`;
-    const subject = "Tomato-Duck: Reset your password";
-    const send_to = user.email;
-    const send_from = process.env.EMAIL_USER!;
-    const reply_to = "noreply@tomato.duck";
-    const template = "forgotPassword";
-    const name = user.userName;
-    const link = resetUrl;
-    await sendEmail(
-      subject,
-      send_to,
-      send_from,
-      reply_to,
-      template,
-      name,
-      link
-    );
-    return res
-      .status(200)
-      .json({ message: "Password reset, email has been sent" });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "server error" });
-  }
-};
+
 
 export const resetPassword = async (req: Request, res: Response) => {
   try {
@@ -259,56 +217,30 @@ export const changePassword = async (req: Request, res: Response) => {
 };
 //------------EMAIL STUFF-------------------
 
-export const autoEmailSend = async (req: Request, res: Response) => {
-  const { subject, send_to, reply_to, template, url } = req.body;
-  if (!subject || !send_to || !reply_to || !template)
-    return res.status(500).json({ message: "missing email parameters" });
-  const user = await User.findOne({ email: send_to });
-  if (!user) return res.status(404).json({ message: `user not found` });
-  const send_from = process.env.EMAIL_USER!;
-  const name = user.userName;
-  const link = `http://localhost:3001${url}`;
+export const sendVerifyEmail = async (req: Request, res: Response) => {
   try {
-    await sendEmail(
-      subject,
-      send_to,
-      send_from,
-      reply_to,
-      template,
-      name,
-      link
-    );
-    return res.status(200).json({ message: "email sent" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "server error" });
-  }
-};
-
-export const sendVerifyEmail = async ({ user }: Request, res: Response) => {
-  try {
-    const verUser = await User.findById(user._id);
+    const verUser = await User.findById(req.user._id);
     if (!verUser) return res.status(404).json({ message: "user not found" });
     if (verUser.isVerified)
       return res.status(400).json({ message: "User already verified" });
     let token = await Token.findOne({ userId: verUser._id });
     if (token) await token.deleteOne();
-    const verificationToken = crypto.randomBytes(32).toString("hex") + user._id;
+    const verificationToken = crypto.randomBytes(32).toString("hex") + req.user._id;
     const hashedToken = hashToken(verificationToken);
     await new Token({
-      userId: user._id,
+      userId: req.user._id,
       vToken: hashedToken,
       createdAt: Date.now(),
       expiresAt: Date.now() + 60 * 60 * 1000,
     }).save();
 
-    const verificationUrl = `http://localhost:3001/api/verify/${verificationToken}`;
+    const verificationUrl = `http://localhost:5173/user/verify/${verificationToken}`;
     const subject = "Tomato-Duck: Verify your account";
-    const send_to = user.email;
+    const send_to = req.user.email;
     const send_from = process.env.EMAIL_USER!;
     const reply_to = "noreply@tomato.duck";
     const template = "verifyEmail";
-    const name = user.userName;
+    const name = req.user.userName;
     const link = verificationUrl;
     await sendEmail(
       subject,
@@ -321,7 +253,50 @@ export const sendVerifyEmail = async ({ user }: Request, res: Response) => {
     );
     return res.status(200).json({ message: "Account verification email sent" });
   } catch (error) {
+    res.status(500).json({message: 'Email not sent, something went wrong'})
+  }
+};
+export const forgotPassword = async (req: Request, res: Response) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user)
+      return res
+        .status(404)
+        .json({ message: "no user associated with this email" });
+    let token = await Token.findOne({ userId: user._id });
+    if (token) return await token.deleteOne();
+    const resetToken = crypto.randomBytes(32).toString("hex") + user._id;
+    const hashedToken = hashToken(resetToken);
+    await new Token({
+      userId: user._id,
+      rToken: hashedToken,
+      createdAt: Date.now(),
+      expiresAt: Date.now() + 60 * 60 * 1000,
+    }).save();
+    const resetUrl = `http://localhost:5173/resetpassword/${resetToken}`;
+    const subject = "Tomato-Duck: Reset your password";
+    const send_to = user.email;
+    const send_from = process.env.EMAIL_USER!;
+    const reply_to = "noreply@tomato.duck";
+    const template = "forgotPassword";
+    const name = user.userName;
+    const link = resetUrl;
+    await sendEmail(
+      subject,
+      send_to,
+      send_from,
+      reply_to,
+      template,
+      name,
+      link
+    );
+    return res
+      .status(200)
+      .json({ message: "Password reset, email has been sent" });
+  } catch (error) {
     console.error(error);
+    return res.status(500).json({ message: "server error" });
   }
 };
 // ----------- TASK STUFF --------------------

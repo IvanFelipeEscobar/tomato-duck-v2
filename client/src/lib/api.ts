@@ -21,6 +21,8 @@ export const addNewUser = async (
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
+
     body: JSON.stringify({ userName, email, password }),
   });
 
@@ -30,6 +32,8 @@ export const logInUser = async (email: string, password: string) =>
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
+
     body: JSON.stringify({ email, password }),
   });
 
@@ -39,6 +43,8 @@ export const loginStatus = async () =>
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
+
   });
 
 export const logOutUser = async () =>
@@ -55,6 +61,7 @@ export const sendVerifyEmail = async () =>
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
   });
 
 export const verifyAccount = async (verificationToken: string) =>
@@ -64,7 +71,22 @@ export const verifyAccount = async (verificationToken: string) =>
       "Content-Type": "application/json",
     },
   });
-
+export const sendResetPassword = async (email: string) =>
+  await fetch(`${url}api/forgotpassword`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email }),
+  });
+export const resetPassword = async (resetToken: string, password: string) =>
+  await fetch(`${url}api/resetpassword/${resetToken}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ password }),
+  });
 //------------------- Task/Session Stuff
 export const addNewSession = async (userId: string) =>
   await fetch(`${url}api/${userId}/session`, {

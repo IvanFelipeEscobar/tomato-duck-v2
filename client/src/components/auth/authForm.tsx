@@ -1,9 +1,14 @@
 import React, { useState } from "react";
 import useAuthStore from "../../lib/authStore";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import ForgotPassword from "./forgotPassword";
+import { MdLogin } from "react-icons/md";
+import { toast } from "react-toastify";
+import { sendVerifyEmail } from "../../lib/api";
 import { useNavigate } from "react-router-dom";
 
 const AuthForm: React.FC = () => {
+  const navigate = useNavigate()
   const [type, setType] = useState("login");
   const [passState, setPassState] = useState("password");
   const [formData, setFormData] = useState({
@@ -16,22 +21,34 @@ const AuthForm: React.FC = () => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
-  const navigate = useNavigate();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     const { email, username, password } = formData;
+    if (password.length < 6) {
+      toast.error("Password must be atleast 6 characters");
+      return;
+    }
 
     if (type === "login") {
       await signIn(email.toLowerCase(), password);
     } else {
       await signUp(username, email.toLowerCase(), password);
+
+      const em = await sendVerifyEmail();
+      const { message } = await em.json();
+      if (em.ok) {
+        toast.success(message);
+      } else {
+        toast.error(message);
+      }
     }
     navigate('/')
   };
 
   return (
     <div className="flex items-center justify-center py-12 ">
-      <div className="max-w-md w-full space-y-8 bg-base-100 bg-opacity-65 rounded-xl px-6 py-12">
+      <div className="max-w-md w-full space-y-6 bg-base-100 bg-opacity-65 rounded-xl px-6 py-12">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-error font-serif">
             {type === "login"
@@ -39,7 +56,7 @@ const AuthForm: React.FC = () => {
               : "Create a new account"}
           </h2>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="mt-8 space-y-8" onSubmit={handleSubmit}>
           {type === "signup" && (
             <div>
               <input
@@ -68,7 +85,7 @@ const AuthForm: React.FC = () => {
               onChange={handleInputChange}
             />
           </div>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between relative">
             <input
               id="password"
               name="password"
@@ -80,27 +97,35 @@ const AuthForm: React.FC = () => {
               value={formData.password}
               onChange={handleInputChange}
             />
+            <div className="absolute top-10  right-0">
+             {type === 'login' && <ForgotPassword />}
+            </div>
             <div>
               {passState === "password" ? (
-                <button
+                <div
                   className="btn btn-sm btn-ghost"
-                  onClick={() => setPassState("notpassword")}
+                  onClick={() => {
+                    setPassState("notpassword");
+                  }}
                 >
                   <FaEye />
-                </button>
+                </div>
               ) : (
-                <button
+                <div
                   className="btn btn-sm btn-ghost"
-                  onClick={() => setPassState("password")}
+                  onClick={() => {
+                    setPassState("password");
+                  }}
                 >
                   <FaEyeSlash />
-                </button>
+                </div>
               )}
             </div>
           </div>
+          <div className="divider"></div>
           <div>
             <button type="submit" className="btn btn-primary w-full btn-sm">
-              {type === "login" ? "Log in" : "Sign up"}
+              <MdLogin /> {type === "login" ? "Log in" : "Sign up"}
             </button>
           </div>
         </form>

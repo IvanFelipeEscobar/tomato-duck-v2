@@ -1,10 +1,14 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App.tsx'
-import './index.css'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App.tsx";
+import "./index.css";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import TaskPanel from "./components/task-panel";
-import Signin from './components/auth/sign-in.tsx';
+import UserAuth from "./components/auth/index.tsx";
+import ResetPassword from "./components/auth/resetPassword.tsx";
+import VerifyAccount from "./components/auth/verifyAccount.tsx";
+import User from "./components/auth/user.tsx";
+import AuthForm from "./components/auth/authForm.tsx";
 
 const router = createBrowserRouter([
   {
@@ -12,13 +16,22 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       { index: true, element: <TaskPanel /> },
-      { path: "/signup", element: <Signin /> },
+      {
+        path: "/user",
+        element: <UserAuth />,
+        children: [
+          { path: "/user/signup", element: <AuthForm /> },
+          { path: "/user/verify/:verificationToken", element: <VerifyAccount /> },
+          { path: "/user/resetpassword/:resetToken", element: <ResetPassword /> },
+          { path: "/user/", element: <User /> },
+        ],
+      },
     ],
   },
 ]);
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <RouterProvider router={router}/>
-  </React.StrictMode>,
-)
+    <RouterProvider router={router} />
+  </React.StrictMode>
+);

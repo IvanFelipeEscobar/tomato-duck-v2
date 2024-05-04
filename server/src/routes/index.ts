@@ -10,7 +10,6 @@ import {
   loginUser, logOutUser,
   editUser,
   loginStatus,
-  autoEmailSend,
   sendVerifyEmail,
   verifyUser,
   forgotPassword,
@@ -26,7 +25,6 @@ router.route("/api/user").post(addUser).get(authMiddleware, getUser).put(authMid
 router.route('/api/login').post(loginUser).get(loginStatus)
 router.route('/api/logout').get(logOutUser)
 
-router.route('/api/autoemail').post(authMiddleware, autoEmailSend)
 router.route('/api/sendVerifyEmail').post(authMiddleware, sendVerifyEmail)
 router.route('/api/verify/:verificationToken').put(verifyUser)
 router.route('/api/forgotpassword').put(forgotPassword)

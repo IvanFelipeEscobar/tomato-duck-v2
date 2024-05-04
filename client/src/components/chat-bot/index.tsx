@@ -99,7 +99,7 @@ const ChatBot = () => {
 
   return (
     <div className="flex flex-col gap-2 items-center relative">
-      <div className="absolute top-9 italic font-serif right-20 hidden sm:block">Quack Your Way to Solutions with Duck-GPT</div>
+      <div className="absolute top-9 italic font-serif right-20 hidden text-base-200 sm:block">Quack Your Way to Solutions with Duck-GPT</div>
       <div className="text-3xl italic py-2 ml-5 font-mono">Duck-Gpt</div>
       <div className="max-h-[275px] lg:max-h-[500px] shadow-2xl w-2/3 max-w-3xl bg-base-200  bg-opacity-45 bg-no-repeat bg-center rounded-2xl lg:mr-12 overflow-auto scroll p-1 relative min-w-80 border-2">
         {chatLog.map((log) => (

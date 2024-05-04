@@ -7,8 +7,7 @@ export default function Timer() {
   const [active, setActive] = useState(0);
   const [timer, setTimer] = useState<number>(300);
   const { seconds, minutes, restart, pause, resume } = useTimer({
-    expiryTimestamp: time,
-    onExpire: () => console.warn("onExpire called"),
+    expiryTimestamp: time
   });
   const timerTime = [
     { name: `Tomato Time`, add: 1500, time: '25 minutes' },

@@ -11,7 +11,7 @@ const Nav = () => {
         {isAuthenticated ? (
           <span onClick={async () => await logOut()}>Log out</span>
         ) : (
-          <Link to="/signup">sign in</Link>
+          <Link to="/user/signup">sign in</Link>
         )}
       </button>
     </div>

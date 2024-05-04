@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const tokenSchema: Schema = new Schema({
   userId: {
@@ -11,10 +11,6 @@ const tokenSchema: Schema = new Schema({
     default: "",
   },
   rToken: {
-    type: String,
-    default: "",
-  },
-  lToken: {
     type: String,
     default: "",
   },
