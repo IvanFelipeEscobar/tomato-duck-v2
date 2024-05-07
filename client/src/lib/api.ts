@@ -9,6 +9,7 @@ export const fetchUser = async () =>
     headers: {
       "Content-Type": "application/json",
     },
+    credentials:'include'
   });
 
 export const addNewUser = async (
@@ -53,6 +54,7 @@ export const logOutUser = async () =>
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: 'include'
   });
 
 export const sendVerifyEmail = async () =>

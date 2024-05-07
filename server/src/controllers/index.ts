@@ -7,6 +7,8 @@ import "dotenv/config";
 import sendEmail from "../utils/sendEmail";
 import { Token } from "../models/token";
 import crypto from "crypto";
+import { populate } from "dotenv";
+import { model } from "mongoose";
 // --------------USER CONTROLLERS ----------
 export const addUser = async (req: Request, res: Response) => {
   try {
@@ -30,7 +32,7 @@ export const addUser = async (req: Request, res: Response) => {
       userName,
       email,
       password,
-      sessions: [],
+      sessions: []
     });
     if (!newUser)
       return res
@@ -103,10 +105,10 @@ export const getUser = async ({ user }: Request, res: Response) => {
       path: "sessions",
       populate: {
         path: "tasks",
-        select: "-__v",
       },
     });
-    if (!user) return res.status(404).json({ message: `user not found` });
+    if (!activeUser) return res.status(404).json({ message: `user not found` });
+    console.log(activeUser)
     return res.status(200).json(activeUser);
   } catch (error) {
     console.error(error);
@@ -259,7 +261,7 @@ export const sendVerifyEmail = async (req: Request, res: Response) => {
 export const forgotPassword = async (req: Request, res: Response) => {
   const { email } = req.body;
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne( {email} );
     if (!user)
       return res
         .status(404)
@@ -274,7 +276,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
       createdAt: Date.now(),
       expiresAt: Date.now() + 60 * 60 * 1000,
     }).save();
-    const resetUrl = `http://localhost:5173/resetpassword/${resetToken}`;
+    const resetUrl = `http://localhost:5173/user/resetpassword/${resetToken}`;
     const subject = "Tomato-Duck: Reset your password";
     const send_to = user.email;
     const send_from = process.env.EMAIL_USER!;

@@ -1,8 +1,9 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-export interface User {
+interface User {
   _id: string;
   email: string;
+  userName: string;
   sessions: Session[] | [];
 }
 export interface Session {
@@ -17,7 +18,7 @@ export interface Task {
 }
 
 export interface TaskState {
-  user: User;
+  currentUser: User;
   activeSession: string | null;
 }
 
@@ -32,9 +33,10 @@ export interface TaskActions {
 }
 
 export const initialState: TaskState = {
-  user: {
+  currentUser: {
     _id: "00001",
     email: "guest",
+    userName: 'guest',
     sessions: [{ _id: "0001", tasks: [] }],
   },
   activeSession: null,
@@ -44,14 +46,14 @@ const useTaskStore = create<TaskState & TaskActions>()(
   persist(
     (set) => ({
       ...initialState,
-      setUser: (user) => set({ user }),
+      setUser: (currentUser) => set({ currentUser }),
 
       addSession: (session) =>
         set((state) => ({
           ...state,
-          user: {
-            ...state.user,
-            sessions: [...state.user.sessions, session],
+          currentUser: {
+            ...state.currentUser,
+            sessions: [...state.currentUser.sessions, session],
           },
           activeSession: state.activeSession || session._id,
         })),
@@ -61,9 +63,9 @@ const useTaskStore = create<TaskState & TaskActions>()(
       deleteSession: (sessionId: string) =>
         set((state) => ({
           ...state,
-          user: {
-            ...state.user,
-            sessions: state.user.sessions.filter(
+         currentUser: {
+            ...state.currentUser,
+            sessions: state.currentUser.sessions.filter(
               (session) => session._id !== sessionId
             ),
           },
@@ -73,15 +75,15 @@ const useTaskStore = create<TaskState & TaskActions>()(
 
       addTask: (sessionId, task) =>
         set((state) => {
-          const addTaskArray = state.user.sessions.map((session) =>
+          const addTaskArray = state.currentUser.sessions.map((session) =>
             session._id === sessionId
               ? { ...session, tasks: [...session.tasks, task] }
               : session
           );
           return {
             ...state,
-            user: {
-              ...state.user,
+            currentUser: {
+              ...state.currentUser,
               sessions: addTaskArray,
             },
           };
@@ -89,7 +91,7 @@ const useTaskStore = create<TaskState & TaskActions>()(
 
       delTask: (sessionId, taskId) =>
         set((state) => {
-          const delTaskArray = state.user.sessions.map((session) =>
+          const delTaskArray = state.currentUser.sessions.map((session) =>
             session._id === sessionId
               ? {
                   ...session,
@@ -99,8 +101,8 @@ const useTaskStore = create<TaskState & TaskActions>()(
           );
           return {
             ...state,
-            user: {
-              ...state.user,
+            currentUser: {
+              ...state.currentUser,
               sessions: delTaskArray,
             },
           };
@@ -108,7 +110,7 @@ const useTaskStore = create<TaskState & TaskActions>()(
 
       toggleTask: (sessionId, taskId) =>
         set((state) => {
-          const toggleTaskArray = state.user.sessions.map((session) =>
+          const toggleTaskArray = state.currentUser.sessions.map((session) =>
             session._id === sessionId
               ? {
                   ...session,
@@ -120,8 +122,8 @@ const useTaskStore = create<TaskState & TaskActions>()(
           );
           return {
             ...state,
-            user: {
-              ...state.user,
+            currentUser: {
+              ...state.currentUser,
               sessions: toggleTaskArray,
             },
           };

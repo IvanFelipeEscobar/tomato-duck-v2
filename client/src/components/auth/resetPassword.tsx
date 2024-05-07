@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { resetPassword } from "../../lib/api";
+import { TbPasswordUser } from "react-icons/tb";
 
 const ResetPassword = () => {
   const {resetToken} = useParams();
   const [newPass, setNewPass] = useState("");
   const [verPass, setVerPass] = useState("");
+  const nav = useNavigate()
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newPass !== verPass) {
@@ -21,8 +23,7 @@ const ResetPassword = () => {
     const { message } = await res.json();
     if (res.ok) {
       toast.success(message);
-      setVerPass("");
-      setNewPass("");
+     nav('/signup')
     } else {
         toast.error(message);
         setVerPass("");
@@ -31,7 +32,7 @@ const ResetPassword = () => {
   };
   return (
     <form
-      className="flex items-center justify-center"
+      className="flex justify-center pt-12"
       onSubmit={handleReset}
     >
       <div className="bg-base-100 card max-w-96">
@@ -57,7 +58,7 @@ const ResetPassword = () => {
               onChange={(e) => setVerPass(e.target.value)}
             />
           </label>
-          <button className="btn btn-success">Submit New Password</button>
+          <button className="btn btn-info"><TbPasswordUser />Submit Password</button>
         </div>
       </div>
     </form>

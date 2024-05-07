@@ -8,7 +8,7 @@ export interface IUser extends Document {
   email: string;
   password: string;
   photo: string;
-  userAgent: []
+  userAgent: [];
   isVerified: boolean;
   sessions: Array<ISession>;
 }
@@ -38,7 +38,6 @@ const userSchema: Schema = new Schema(
       },
     ],
     password: { type: String, required: [true, "please add a password"] },
-    photo: String,
     isVerified: {
       type: Boolean,
       default: false,
@@ -61,16 +60,20 @@ userSchema.pre<IUser>("save", async function (this, next) {
 export const User = mongoose.model<IUser>("User", userSchema);
 
 //--------------SESSION SCHEMA/MODEL-------------
-const sessionSchema: Schema = new Schema({
-  tasks: [{ type: Schema.Types.ObjectId, ref: "Task" }],
-});
-
+const sessionSchema: Schema = new Schema(
+  {
+    tasks: [{ type: Schema.Types.ObjectId, ref: "Task" }],
+  },
+  {
+    minimize: false,
+  }
+);
 export const Session = mongoose.model<ISession>("Session", sessionSchema);
 
 //---------------TASK SCHEMA/MODEL-------------------
 const taskSchema: Schema = new Schema({
   task: String,
   isDone: { type: Boolean, default: false },
-});
+}, {minimize: false});
 
 export const Task = mongoose.model<ITask>("Task", taskSchema);

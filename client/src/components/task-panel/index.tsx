@@ -1,66 +1,75 @@
 import Timer from "../timer";
 import SessionPanel from "./session";
 import { MdAssignmentAdd } from "react-icons/md";
-// import { addNewSession } from "../../lib/api.ts";
+import { addNewSession } from "../../lib/api.ts";
 import { v4 as uuidv4 } from "uuid";
 import useTaskStore, { Session } from "../../lib/taskStore.ts";
 import { useState } from "react";
 import ChatBot from "../chat-bot/index.tsx";
-
+import useAuthStore from "../../lib/authStore.ts";
 
 const TaskPanel = () => {
+  const { isAuthenticated, user } = useAuthStore();
   const [view, setView] = useState<string>("tomato");
-  const { addSession, user } = useTaskStore();
+  const { addSession, currentUser } = useTaskStore();
 
   const handleAddSession = async () => {
-    // if (isAuthenticated) {
-    //   try {
-    //     const res = await addNewSession(user._id);
-    //     const newSess: Session = await res.json();
-    //     addSession(newSess);
-    //   } catch (error) {
-    //     console.error(error);
-    //   }
-    // } else {
-    const session: Session = {
-      _id: uuidv4(),
-      tasks: [],
-    };
-    addSession(session);
+    if (isAuthenticated && user) {
+      try {
+        const res = await addNewSession(user._id);
+        const newSess = await res.json();
+        addSession(newSess);
+      } catch (error) {
+        console.error(error);
+      }
+    } else {
+      const session: Session = {
+        _id: uuidv4(),
+        tasks: [],
+      };
+      addSession(session);
+    }
   };
-  // };
   return (
-    <> 
+    <>
       <div className="pt-16 sm:pt-12 flex flex-col-reverse  gap-4 justify-end items-center bg-error min-h-screen">
         <div className="md:w-3/4 lg:w-1/2 w-full px-1">
-          <div>
-            {user.sessions[user.sessions.length - 1].tasks.length === 0 ? (
-              <div
-                className="tooltip tooltip-right"
-                data-tip="Add atleast one task to your latest session before you create a new one"
-              >
+          {currentUser.sessions.length === 0 ? (
+            <button
+              className="btn btn-info btn-sm text-base-200 rounded-full my-4 "
+              onClick={handleAddSession}
+            >
+              Add session
+              <MdAssignmentAdd />
+            </button>
+          ) : (
+            <div>
+              {currentUser.sessions[currentUser.sessions.length - 1]?.tasks
+                .length === 0 ? (
+                <div
+                  className="tooltip tooltip-right"
+                  data-tip="Add atleast one task to your latest session before you create a new one"
+                >
+                  <button className="btn btn-info btn-sm text-base-200 rounded-full my-4 btn-disabled">
+                    Add session
+                    <MdAssignmentAdd />
+                  </button>
+                </div>
+              ) : (
                 <button
-                  className="btn btn-info btn-sm text-base-200 rounded-full my-4 btn-disabled"
+                  className="btn btn-info btn-sm text-base-200 rounded-full my-4 "
                   onClick={handleAddSession}
                 >
                   Add session
                   <MdAssignmentAdd />
                 </button>
-              </div>
-            ) : (
-              <button
-                className="btn btn-info btn-sm text-base-200 rounded-full my-4 "
-                onClick={handleAddSession}
-              >
-                Add session
-                <MdAssignmentAdd />
-              </button>
-            )}
-          </div>
+              )}
+            </div>
+          )}
           <SessionPanel />
         </div>
         <div className={view === "tomato" ? "" : "hidden"}>
-          <Timer />{" "}
+          <Timer />
         </div>
         <div className={view === "duck" ? "" : "hidden"}>
           <ChatBot />

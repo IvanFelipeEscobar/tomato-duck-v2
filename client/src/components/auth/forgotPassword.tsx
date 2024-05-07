@@ -2,68 +2,76 @@ import { useState } from "react";
 import { MdOutlineAttachEmail } from "react-icons/md";
 import { sendResetPassword } from "../../lib/api";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const ForgotPassword = () => {
+  const navigate = useNavigate()
   const [resetPassEmail, setResetPassEmail] = useState("");
   const sendLink = async (e: React.MouseEvent) => {
     e.preventDefault();
-    try {
-        const res = await sendResetPassword(resetPassEmail)
-        if(res.ok) {
-toast.success('Reset link sent to email')
-        }else{
-        const { message } = await res.json();
-        toast.error(message);
+      const res = await sendResetPassword(resetPassEmail.toLowerCase());
 
-        }
-    } catch (error) {
-        console.log(error)
-    }
+      const { message } = await res.json();
+      if (res.ok) {
+        toast.success(message);
+      } else {
+        toast.error(message);
+      }
+   navigate('/')
   };
   return (
-    <div className="dropdown">
+    <>
       <div
-        tabIndex={0}
-        role="button"
         className=" italic font-bold text-primary font-mono tracking-widest"
+        onClick={() => {
+          const modal = document.getElementById(
+            "forgot-pass"
+          )! as HTMLDialogElement;
+          return modal.showModal();
+        }}
       >
         forgot password?
       </div>
-      <div
-        tabIndex={0}
-        className="dropdown-content card shadow  w-80 bg-base-100 text-primary-content"
-      >
-        <div className="card-body">
-          <h3 className="card-title font-mono tracking-widest">
-            Reset password
-          </h3>
-          <div>
-            <input
-              id="reset-email"
-              name="reset-password-email"
-              type="email"
-              autoComplete="email"
-              className="input input-bordered w-full input-sm"
-              placeholder="Email address"
-              value={resetPassEmail}
-              onChange={(e) => setResetPassEmail(e.target.value)}
-            />
+      <dialog id="forgot-pass" className="modal modal-bottom sm:modal-middle">
+        <div className="modal-box">
+          <div className="card-body">
+            <h3 className="card-title font-mono tracking-widest">
+              Reset password
+            </h3>
+            <div>
+              <input
+                id="reset-email"
+                name="reset-password-email"
+                type="email"
+                autoComplete="email"
+                className="input input-bordered w-full input-sm"
+                placeholder="Email address"
+                value={resetPassEmail}
+                onChange={(e) => setResetPassEmail(e.target.value)}
+              />
+            </div>
+            <button
+              type="submit"
+              className={
+                (resetPassEmail.trim() || resetPassEmail.length < 6) === ""
+                  ? "btn btn-sm  btn-disabled"
+                  : "btn btn-info btn-sm "
+              }
+              onClick={sendLink}
+            >
+              <MdOutlineAttachEmail />
+              Send Reset Link
+            </button>
           </div>
-          <button
-            type="submit"
-            className={
-              (resetPassEmail.trim()||resetPassEmail.length<6) === ""
-                ? "btn btn-sm  btn-disabled"
-                : "btn btn-info btn-sm "
-            }
-            onClick={sendLink}
-          >
-            <MdOutlineAttachEmail />
-            Send Reset Link
-          </button>
+          <div className="modal-action">
+            <form method="dialog">
+              {/* if there is a button in form, it will close the modal */}
+              <button className="btn">Close</button>
+            </form>
+          </div>
         </div>
-      </div>
-    </div>
+      </dialog>
+    </>
   );
 };
 

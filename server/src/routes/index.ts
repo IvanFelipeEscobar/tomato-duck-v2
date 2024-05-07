@@ -27,7 +27,7 @@ router.route('/api/logout').get(logOutUser)
 
 router.route('/api/sendVerifyEmail').post(authMiddleware, sendVerifyEmail)
 router.route('/api/verify/:verificationToken').put(verifyUser)
-router.route('/api/forgotpassword').put(forgotPassword)
+router.route('/api/forgotpassword').post(forgotPassword)
 router.route('/api/resetpassword/:resetToken').put(resetPassword)
 router.route('/api/changepassword').put(authMiddleware ,changePassword)
 

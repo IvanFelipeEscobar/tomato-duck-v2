@@ -6,9 +6,10 @@ import { MdLogin } from "react-icons/md";
 import { toast } from "react-toastify";
 import { sendVerifyEmail } from "../../lib/api";
 import { useNavigate } from "react-router-dom";
+import useTaskStore from "../../lib/taskStore";
 
 const AuthForm: React.FC = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [type, setType] = useState("login");
   const [passState, setPassState] = useState("password");
   const [formData, setFormData] = useState({
@@ -16,7 +17,8 @@ const AuthForm: React.FC = () => {
     username: "",
     password: "",
   });
-  const { signIn, signUp } = useAuthStore();
+  const { signIn, signUp, user } = useAuthStore();
+  const {setUser} = useTaskStore()
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
@@ -43,7 +45,8 @@ const AuthForm: React.FC = () => {
         toast.error(message);
       }
     }
-    navigate('/')
+setUser(user!)
+    navigate("/");
   };
 
   return (
@@ -85,7 +88,7 @@ const AuthForm: React.FC = () => {
               onChange={handleInputChange}
             />
           </div>
-          <div className="flex items-center justify-between relative">
+          <div className="flex items-center justify-between">
             <input
               id="password"
               name="password"
@@ -97,9 +100,7 @@ const AuthForm: React.FC = () => {
               value={formData.password}
               onChange={handleInputChange}
             />
-            <div className="absolute top-10  right-0">
-             {type === 'login' && <ForgotPassword />}
-            </div>
+
             <div>
               {passState === "password" ? (
                 <div
@@ -129,6 +130,9 @@ const AuthForm: React.FC = () => {
             </button>
           </div>
         </form>
+        <div className="text-center">
+          {type === "login" && <ForgotPassword />}
+        </div>
         <div className="text-center">
           <p className="text-sm text-gray-600">
             {type === "login"
