@@ -77,10 +77,8 @@ const useAuthStore = create<AuthState & AuthActions>()(
         // Perform sign-in API request
         const response = await logInUser(email, password);
         if (response.ok) {
-          const user = await response.json();
-          set({ isAuthenticated: true, user, isLoading: false });
+          set({ isAuthenticated: true, isLoading: false });
           toast.success("welcome back!");
-          return user
         } else {
           const { message } = await response.json();
           toast.error(message);
@@ -109,7 +107,7 @@ const useAuthStore = create<AuthState & AuthActions>()(
           const response = await logOutUser();
           if (response.ok) {
             set({ isAuthenticated: false, user: null });
-            toast.success("Logged out successfully!");
+            toast.info("Logged out successfully!");
           } else {
             const { message } = await response.json();
             set({ isError: true, message });

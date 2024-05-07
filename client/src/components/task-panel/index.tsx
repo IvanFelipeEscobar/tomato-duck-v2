@@ -7,13 +7,15 @@ import useTaskStore, { Session } from "../../lib/taskStore.ts";
 import { useState } from "react";
 import ChatBot from "../chat-bot/index.tsx";
 import useAuthStore from "../../lib/authStore.ts";
+import useUserHook from "./useUserHook.tsx";
 
 const TaskPanel = () => {
   const { isAuthenticated, user } = useAuthStore();
   const [view, setView] = useState<string>("tomato");
   const { addSession, currentUser } = useTaskStore();
-
+useUserHook()
   const handleAddSession = async () => {
+   
     if (isAuthenticated && user) {
       try {
         const res = await addNewSession(user._id);
@@ -44,7 +46,7 @@ const TaskPanel = () => {
             </button>
           ) : (
             <div>
-              {currentUser.sessions[currentUser.sessions.length - 1]?.tasks
+              {currentUser.sessions[currentUser.sessions.length - 1]?.tasks && currentUser.sessions[currentUser.sessions.length - 1]?.tasks
                 .length === 0 ? (
                 <div
                   className="tooltip tooltip-right"

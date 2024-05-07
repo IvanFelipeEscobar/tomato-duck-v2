@@ -1,30 +1,8 @@
-import { useEffect } from "react";
 import useAuthStore from "../../lib/authStore";
-import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
-import { loginStatus } from "../../lib/api";
+import AuthHook from "./useAuthHook";
 const User = () => {
   const { user } = useAuthStore();
-  console.log(user);
-  const nav = useNavigate();
-  useEffect(() => {
-    let isLog: boolean;
-
-    const redirectOnLogout = async () => {
-      try {
-        const res = await loginStatus();
-       isLog = await res.json();
-      } catch (error) {
-        console.log(error);
-      }
-      if (!isLog) {
-        toast.info("session expired, please log in");
-        nav("/");
-        return;
-      }
-    };
-    redirectOnLogout();
-  }, [nav]);
+AuthHook()
   return (
     <div className="flex  items-center justify-center py-12">
       <div className="card  bg-base-100 bg-opacity-55 ">

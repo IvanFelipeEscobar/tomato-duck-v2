@@ -6,7 +6,7 @@ import { MdLogin } from "react-icons/md";
 import { toast } from "react-toastify";
 import { sendVerifyEmail } from "../../lib/api";
 import { useNavigate } from "react-router-dom";
-import useTaskStore from "../../lib/taskStore";
+
 
 const AuthForm: React.FC = () => {
   const navigate = useNavigate();
@@ -17,8 +17,7 @@ const AuthForm: React.FC = () => {
     username: "",
     password: "",
   });
-  const { signIn, signUp, user } = useAuthStore();
-  const {setUser} = useTaskStore()
+  const { signIn, signUp} = useAuthStore();
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
@@ -45,7 +44,6 @@ const AuthForm: React.FC = () => {
         toast.error(message);
       }
     }
-setUser(user!)
     navigate("/");
   };
 
