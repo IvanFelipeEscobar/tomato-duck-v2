@@ -89,6 +89,16 @@ export const resetPassword = async (resetToken: string, password: string) =>
     },
     body: JSON.stringify({ password }),
   });
+
+  export const changePassword = async (oldPassword: string, newPassword: string) =>
+    await fetch(`${url}api/changepassword`, {
+      method: 'PUT',
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: 'include',
+      body: JSON.stringify( {oldPassword, newPassword})
+    })
 //------------------- Task/Session Stuff
 export const addNewSession = async (userId: string) =>
   await fetch(`${url}api/${userId}/session`, {

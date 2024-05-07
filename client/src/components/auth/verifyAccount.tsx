@@ -2,9 +2,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import { verifyAccount } from "../../lib/api";
 import { toast } from "react-toastify";
 import { FaUserCheck } from "react-icons/fa6";
+import useAuthStore from "../../lib/authStore";
 
 const VerifyAccount = () => {
   const { verificationToken } = useParams();
+  const {logOut}=useAuthStore()
   const navigate = useNavigate();
   return (
     <div className="flex justify-center pt-20">
@@ -22,7 +24,8 @@ const VerifyAccount = () => {
               } else {
                 toast.error(message);
               }
-              navigate("/");
+              logOut()
+              navigate("/user/signup");
             }}
           >
             <FaUserCheck />

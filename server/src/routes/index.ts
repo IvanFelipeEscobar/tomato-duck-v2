@@ -31,8 +31,6 @@ router.route('/api/forgotpassword').post(forgotPassword)
 router.route('/api/resetpassword/:resetToken').put(resetPassword)
 router.route('/api/changepassword').put(authMiddleware ,changePassword)
 
-
-
 router.route("/api/:userId/session").put(addSession);
 router.route("/api/:userId/:sessionId").delete(deleteSession)
 router.route('/api/:sessionId').put(addTask)

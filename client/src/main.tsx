@@ -9,6 +9,7 @@ import ResetPassword from "./components/auth/resetPassword.tsx";
 import VerifyAccount from "./components/auth/verifyAccount.tsx";
 import User from "./components/auth/user.tsx";
 import AuthForm from "./components/auth/authForm.tsx";
+import ChangePassword from "./components/auth/changePassword.tsx";
 
 const router = createBrowserRouter([
   {
@@ -24,6 +25,7 @@ const router = createBrowserRouter([
           { path: "/user/verify/:verificationToken", element: <VerifyAccount /> },
           { path: "/user/resetpassword/:resetToken", element: <ResetPassword /> },
           { path: "/user/", element: <User /> },
+          { path: "/user/changepassword", element: <ChangePassword /> },
         ],
       },
     ],

@@ -158,7 +158,7 @@ export const verifyUser = async ({ params }: Request, res: Response) => {
       return res.status(400).json({ message: "User is already verified" });
     user.isVerified = true;
     await user.save();
-    res.status(200).json({ message: "Account verification succesful!" });
+    res.status(200).json({ message: "Account verification succesful! Please log in to continue" });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "server error" });
@@ -193,16 +193,16 @@ export const resetPassword = async (req: Request, res: Response) => {
 
 export const changePassword = async (req: Request, res: Response) => {
   try {
-    const { oldPassword, password } = req.body;
+    const { oldPassword, newPassword } = req.body;
     const user = await User.findById(req.user._id);
     if (!user) return res.status(404).json({ message: "user not found" });
-    if (!oldPassword || !password)
+    if (!oldPassword || !newPassword)
       return res
         .status(400)
         .json({ message: "Please enter both old and new passwords" });
     const validatePassword = await bcrypt.compare(oldPassword, user.password);
     if (validatePassword) {
-      user.password = password;
+      user.password = newPassword;
       await user.save();
       return res.status(200).json({
         message:

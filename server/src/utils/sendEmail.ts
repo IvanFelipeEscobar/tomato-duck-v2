@@ -12,23 +12,23 @@ const sendEmail = async (
   name: string,
   link: string
 ) => {
-  // const transporter = nodemailer.createTransport({
-  //   host: process.env.EMAIL_HOST,
-  //   port: 587,
-  //   auth: {
-  //     user: process.env.EMAIL_USER,
-  //     pass: process.env.EMAIL_PASS,
-  //   },
   const transporter = nodemailer.createTransport({
-    host: 'smtp.ethereal.email',
+    host: process.env.EMAIL_HOST,
     port: 587,
     auth: {
-        user: 'quinn68@ethereal.email',
-        pass: '1DTG2W1R5e1KGsA2y5'
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
     },
-    tls: {
-      rejectUnauthorized: false,
-    },
+  // const transporter = nodemailer.createTransport({
+  //   host: 'smtp.ethereal.email',
+  //   port: 587,
+  //   auth: {
+  //       user: 'quinn68@ethereal.email',
+  //       pass: '1DTG2W1R5e1KGsA2y5'
+  //   },
+  //   tls: {
+  //     rejectUnauthorized: false,
+  //   },
   });
 
   const options = {

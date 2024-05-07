@@ -23,7 +23,7 @@ const ResetPassword = () => {
     const { message } = await res.json();
     if (res.ok) {
       toast.success(message);
-     nav('/signup')
+     nav('/user/signup')
     } else {
         toast.error(message);
         setVerPass("");

@@ -52,11 +52,10 @@ const useAuthStore = create<AuthState & AuthActions>()(
           set({ isLoading: true });
           const response = await addNewUser(userName, email, password);
           if (response.ok) {
-            const newUser = await response.json();
+            await response.json();
 
             set({
               isSuccess: true,
-              user: newUser,
               isLoading: false,
               isAuthenticated: true,
             });
