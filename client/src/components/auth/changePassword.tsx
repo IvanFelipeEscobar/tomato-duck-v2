@@ -9,7 +9,7 @@ const ChangePassword = () => {
   const [oldPass, setOldPass] = useState("");
   const [newPass, setNewPass] = useState("");
   const [newPassVer, setNewPassVer] = useState("");
-  const { logOut } = useAuthStore();
+  const { logOut, isLoading } = useAuthStore();
   const nav = useNavigate();
 
   const handleReset = async (e: React.FormEvent) => {
@@ -81,8 +81,8 @@ const ChangePassword = () => {
             />
           </label>
           <button className="btn btn-info">
-            <TbPasswordUser />
-            Submit Password
+           {isLoading ? <span className="loading loading-spinner loading-lg"></span> :<> <TbPasswordUser />
+            Submit Password</>}
           </button>
         </div>
       </div>

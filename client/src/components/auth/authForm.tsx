@@ -17,7 +17,7 @@ const AuthForm: React.FC = () => {
     username: "",
     password: "",
   });
-  const { signIn, signUp} = useAuthStore();
+  const { signIn, signUp, isLoading} = useAuthStore();
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
@@ -144,7 +144,7 @@ const AuthForm: React.FC = () => {
             }}
             className="text-sm font-medium text-success hover:text-indigo-500"
           >
-            {type === "login" ? "Sign up" : "Log in"}
+            {isLoading ? <span className="loading loading-spinner loading-lg"></span> :type === "login" ? "Sign up" : "Log in"}
           </button>
         </div>
       </div>

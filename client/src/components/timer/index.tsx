@@ -11,8 +11,8 @@ export default function Timer() {
   });
   const timerTime = [
     { name: `Tomato Time`, add: 1500, time: '25 minutes' },
-    { name: `Short Break`, add: 300, time: '10 minutes' },
-    { name: `Long Break`, add: 600, time: '5 minutes' },
+    { name: `Short Break`, add: 300, time: '5 minutes' },
+    { name: `Long Break`, add: 600, time: '10 minutes' },
   ];
 
   return (
