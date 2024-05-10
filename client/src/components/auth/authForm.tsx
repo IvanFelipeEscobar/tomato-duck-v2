@@ -132,7 +132,9 @@ const AuthForm: React.FC = () => {
           </div>
         </form>
         <div className="text-center">
-          {type === "login" && <ForgotPassword />}
+          {isLoading ? (
+              <span className="loading loading-spinner loading-lg"></span>
+            ) : type === "login" && <ForgotPassword />}
         </div>
         <div className="text-center">
           <p className="text-sm text-gray-600">
@@ -147,9 +149,7 @@ const AuthForm: React.FC = () => {
             }}
             className="text-sm font-medium text-success hover:text-indigo-500"
           >
-            {isLoading ? (
-              <span className="loading loading-spinner loading-lg"></span>
-            ) : type === "login" ? (
+            {type === "login" ? (
               "Sign up"
             ) : (
               "Log in"
