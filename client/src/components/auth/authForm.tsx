@@ -127,14 +127,14 @@ const AuthForm: React.FC = () => {
           <div className="divider"></div>
           <div>
             <button type="submit" className="btn btn-primary w-full btn-sm">
-              <MdLogin /> {type === "login" ? "Log in" : "Sign up"}
+             {isLoading ? (
+              <span className="loading loading-spinner loading-lg"></span>
+            ) : <><MdLogin /> {type === "login" ? "Log in" : "Sign up"}</>}
             </button>
           </div>
         </form>
         <div className="text-center">
-          {isLoading ? (
-              <span className="loading loading-spinner loading-lg"></span>
-            ) : type === "login" && <ForgotPassword />}
+          { type === "login" && <ForgotPassword />}
         </div>
         <div className="text-center">
           <p className="text-sm text-gray-600">
