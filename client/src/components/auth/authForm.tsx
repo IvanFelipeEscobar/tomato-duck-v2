@@ -7,7 +7,6 @@ import { toast } from "react-toastify";
 import { sendVerifyEmail } from "../../lib/api";
 import { useNavigate } from "react-router-dom";
 
-
 const AuthForm: React.FC = () => {
   const navigate = useNavigate();
   const [type, setType] = useState("login");
@@ -18,16 +17,18 @@ const AuthForm: React.FC = () => {
     password: "",
   });
   const { signIn, signUp, isLoading} = useAuthStore();
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const { email, username, password } = formData;
     if (password.length < 6) {
-      toast.error("Password must be atleast 6 characters");
+      toast.error("Password must be at least 6 characters");
       return;
     }
 
@@ -48,8 +49,8 @@ const AuthForm: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center py-12 ">
-      <div className="max-w-md w-full space-y-6 bg-base-100 bg-opacity-65 rounded-xl px-6 py-12">
+    <div className="flex flex-col-reverse items-center justify-center gap-10  py-12">
+      <div className="max-w-md w-full space-y-6 bg-gray-100 bg-opacity-75 rounded-xl px-6 py-12 shadow-md">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-error font-serif">
             {type === "login"
@@ -91,7 +92,7 @@ const AuthForm: React.FC = () => {
               id="password"
               name="password"
               type={passState === "password" ? "password" : "text"}
-              className="input input-sm w-full "
+              className="input input-sm w-full"
               autoComplete="current-password"
               required
               placeholder="Password"
@@ -106,6 +107,7 @@ const AuthForm: React.FC = () => {
                   onClick={() => {
                     setPassState("notpassword");
                   }}
+                  aria-label="Show password"
                 >
                   <FaEye />
                 </div>
@@ -115,6 +117,7 @@ const AuthForm: React.FC = () => {
                   onClick={() => {
                     setPassState("password");
                   }}
+                  aria-label="Hide password"
                 >
                   <FaEyeSlash />
                 </div>
@@ -144,9 +147,18 @@ const AuthForm: React.FC = () => {
             }}
             className="text-sm font-medium text-success hover:text-indigo-500"
           >
-            {isLoading ? <span className="loading loading-spinner loading-lg"></span> :type === "login" ? "Sign up" : "Log in"}
+            {isLoading ? (
+              <span className="loading loading-spinner loading-lg"></span>
+            ) : type === "login" ? (
+              "Sign up"
+            ) : (
+              "Log in"
+            )}
           </button>
         </div>
+      </div>
+      <div className="mt-4 text-sm text-center">
+        Please enable third-party cookies to use this service. Server response time may be delayed due to inactivity, as it pauses when inactive and needs time to spin back up before processing requests.
       </div>
     </div>
   );

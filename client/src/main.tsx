@@ -10,6 +10,7 @@ import VerifyAccount from "./components/auth/verifyAccount.tsx";
 import User from "./components/auth/user.tsx";
 import AuthForm from "./components/auth/authForm.tsx";
 import ChangePassword from "./components/auth/changePassword.tsx";
+import Pomodoro from "./components/pomodoro/index.tsx";
 
 const router = createBrowserRouter([
   {
@@ -17,6 +18,7 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       { index: true, element: <TaskPanel /> },
+      { path: '/pomodoro', element: <Pomodoro/>},
       {
         path: "/user",
         element: <UserAuth />,

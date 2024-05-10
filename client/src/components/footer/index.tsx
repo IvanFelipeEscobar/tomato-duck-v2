@@ -4,13 +4,13 @@ const Footer = () => {
       <p> Made by Ivan Felipe Escobar with &hearts;</p>
       <p>
         Inspired by
-        <a href="https://pomofocus.io/" target="_blank" className="link">
+        <a href="https://pomofocus.io/" target="_blank" className="link pl-1">
           Pomofocus.io
         </a>
       </p>
       <p>
         Duck-bot powered by
-        <a href="https://openai.com/" target="_blank" className="link">
+        <a href="https://openai.com/" target="_blank" className="link pl-1">
           OpenAi
         </a>
       </p>
