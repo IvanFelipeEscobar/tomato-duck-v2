@@ -4,8 +4,10 @@ import { toast } from "react-toastify";
 import { changePassword } from "../../lib/api";
 import useAuthStore from "../../lib/authStore";
 import { useNavigate } from "react-router-dom";
+import AuthHook from "./useAuthHook";
 
 const ChangePassword = () => {
+  AuthHook()
   const [oldPass, setOldPass] = useState("");
   const [newPass, setNewPass] = useState("");
   const [newPassVer, setNewPassVer] = useState("");
@@ -13,6 +15,7 @@ const ChangePassword = () => {
   const nav = useNavigate();
 
   const handleReset = async (e: React.FormEvent) => {
+
     e.preventDefault();
     if (
       oldPass.trim() === "" ||
