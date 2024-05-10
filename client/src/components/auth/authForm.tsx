@@ -16,7 +16,7 @@ const AuthForm: React.FC = () => {
     username: "",
     password: "",
   });
-  const { signIn, signUp, isLoading} = useAuthStore();
+  const { signIn, signUp, isLoading } = useAuthStore();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -127,14 +127,18 @@ const AuthForm: React.FC = () => {
           <div className="divider"></div>
           <div>
             <button type="submit" className="btn btn-primary w-full btn-sm">
-             {isLoading ? (
-              <span className="loading loading-spinner loading-lg"></span>
-            ) : <><MdLogin /> {type === "login" ? "Log in" : "Sign up"}</>}
+              {isLoading ? (
+                <span className="loading loading-spinner loading-lg"></span>
+              ) : (
+                <>
+                  <MdLogin /> {type === "login" ? "Log in" : "Sign up"}
+                </>
+              )}
             </button>
           </div>
         </form>
         <div className="text-center">
-          { type === "login" && <ForgotPassword />}
+          {type === "login" && <ForgotPassword />}
         </div>
         <div className="text-center">
           <p className="text-sm text-gray-600">
@@ -149,16 +153,16 @@ const AuthForm: React.FC = () => {
             }}
             className="text-sm font-medium text-success hover:text-indigo-500"
           >
-            {type === "login" ? (
-              "Sign up"
-            ) : (
-              "Log in"
-            )}
+            {type === "login" ? "Sign up" : "Log in"}
           </button>
         </div>
       </div>
-      <div className="mt-4 text-sm text-center">
-        Please enable third-party cookies to use this service. Server response time may be delayed due to inactivity, as it pauses when inactive and needs time to spin back up before processing requests.
+      <div className="mt-4 text-sm text-center mx-8">
+        Google has started to disable third-party cookies for a limited
+        percentage of Chrome users, Please enable third-party cookies to use
+        this service. The whole site works without the need for authentication.
+        Server response time may be delayed due to inactivity, as it pauses when
+        inactive and needs time to spin back up before processing requests.
       </div>
     </div>
   );
